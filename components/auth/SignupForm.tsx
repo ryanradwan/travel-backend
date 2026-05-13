@@ -17,7 +17,11 @@ function SubmitButton() {
   );
 }
 
-export default function SignupForm() {
+interface SignupFormProps {
+  referralCode?: string;
+}
+
+export default function SignupForm({ referralCode }: SignupFormProps) {
   const [result, setResult] = useState<{ error?: string; success?: string } | null>(null);
 
   async function handleAction(formData: FormData) {
@@ -39,6 +43,15 @@ export default function SignupForm() {
   return (
     <form action={handleAction} className="space-y-4">
       {result?.error && <Alert type="error" message={result.error} />}
+
+      {referralCode && (
+        <>
+          <input type="hidden" name="referral_code" value={referralCode} />
+          <div className="bg-teal/10 border border-teal/30 rounded px-3 py-2 text-sm text-teal">
+            Referral code applied: <strong>{referralCode.toUpperCase()}</strong> — 50% off your first month
+          </div>
+        </>
+      )}
 
       <Input
         label="Email address"

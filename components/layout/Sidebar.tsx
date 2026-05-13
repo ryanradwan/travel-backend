@@ -14,11 +14,17 @@ import {
   LogOut,
   Wand2,
   BookOpen,
+  FileText,
+  Globe,
+  Package,
 } from "lucide-react";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/chat", label: "Ask TripDesk", icon: MessageSquare },
+  { href: "/dashboard/workflows/itinerary", label: "Client Itinerary", icon: FileText },
+  { href: "/dashboard/workflows/research", label: "Destination Report", icon: Globe },
+  { href: "/dashboard/workflows/package", label: "Tour Package", icon: Package },
   { href: "/dashboard/clients", label: "Clients", icon: Users },
   { href: "/dashboard/tasks", label: "Task History", icon: Clock },
   { href: "/dashboard/templates", label: "Templates", icon: BookOpen },

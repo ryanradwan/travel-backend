@@ -3,21 +3,21 @@ import { FileText, Globe, Package, MessageSquare } from "lucide-react";
 
 const actions = [
   {
-    href: "/dashboard/chat?workflow=itinerary",
+    href: "/dashboard/workflows/itinerary",
     icon: FileText,
     title: "Client Itinerary",
     description: "Turn a client request into a full proposal",
     color: "bg-blue-50 text-blue-600",
   },
   {
-    href: "/dashboard/chat?workflow=research",
+    href: "/dashboard/workflows/research",
     icon: Globe,
     title: "Destination Report",
     description: "Research a destination end to end",
     color: "bg-teal-50 text-teal-600",
   },
   {
-    href: "/dashboard/chat?workflow=package",
+    href: "/dashboard/workflows/package",
     icon: Package,
     title: "Tour Package",
     description: "Build and publish a tour package",

@@ -11,19 +11,28 @@ export default async function ConnectorsDashboardPage({ searchParams }: Connecto
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: connectors } = await supabase
-    .from("connectors")
-    .select("connector_name, status, connected_at, last_health_status")
-    .eq("user_id", user.id);
+  const [connectorsResult, userResult] = await Promise.all([
+    supabase
+      .from("connectors")
+      .select("connector_name, status, connected_at")
+      .eq("user_id", user.id),
+    supabase
+      .from("users")
+      .select("subscription_tier")
+      .eq("id", user.id)
+      .single(),
+  ]);
+
+  const tier = (userResult.data as { subscription_tier: string } | null)?.subscription_tier ?? "starter";
 
   return (
     <ConnectorsPage
-      connectors={(connectors ?? []) as {
+      connectors={(connectorsResult.data ?? []) as {
         connector_name: string;
         status: "connected" | "disconnected" | "unhealthy" | "expired";
         connected_at: string | null;
-        last_health_status: boolean | null;
       }[]}
+      tier={tier}
       connectedParam={searchParams.connected}
       errorParam={searchParams.error}
     />

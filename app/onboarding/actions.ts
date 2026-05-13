@@ -62,5 +62,13 @@ export async function saveBusinessProfile(formData: FormData) {
     return { error: "Couldn't save your profile. Please try again." };
   }
 
+  // Fire welcome email in background — don't block redirect if it fails
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  fetch(`${appUrl}/api/email/welcome`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: user.id }),
+  }).catch(() => {});
+
   redirect("/dashboard");
 }

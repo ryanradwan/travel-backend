@@ -1,9 +1,15 @@
 export type ConnectorId =
+  // Starter (6 fixed)
   | "gmail" | "google_drive" | "google_calendar" | "whatsapp" | "canva" | "skyscanner"
+  // Professional library (choose up to 14)
   | "notion" | "wordpress" | "stripe" | "booking_com" | "mailchimp" | "instagram"
   | "facebook" | "viator" | "tripadvisor" | "airbnb" | "google_docs" | "trello"
   | "whatsapp_business" | "rome2rio" | "rezdy" | "getyourguide" | "klook"
-  | "travefy" | "travel_joy" | "peek_pro" | "tourradar";
+  | "hubspot" | "calendly" | "docusign" | "quickbooks" | "google_sheets"
+  | "slack" | "typeform" | "zoom" | "expedia" | "hostelworld"
+  // Agency only
+  | "travefy" | "travel_joy" | "peek_pro" | "tourradar"
+  | "salesforce" | "monday" | "xero" | "airtable" | "zapier";
 
 export type ConnectorTier = "starter" | "professional" | "agency";
 
@@ -193,6 +199,77 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     whatItDoes: ["Find Asia-Pacific activities", "Compare tour prices", "Check availability"],
     availability: "professional",
   },
+  hubspot: {
+    id: "hubspot", name: "HubSpot", description: "CRM to track leads, clients, and your sales pipeline",
+    category: "productivity", authType: "oauth2",
+    icon: "🔶", color: "bg-orange-50",
+    whatItDoes: ["Log new client enquiries automatically", "Track deals from lead to booking", "Sync contact details from proposals"],
+    availability: "professional",
+  },
+  calendly: {
+    id: "calendly", name: "Calendly", description: "Let clients book consultations directly from proposals",
+    category: "productivity", authType: "oauth2",
+    icon: "📆", color: "bg-blue-50",
+    whatItDoes: ["Add booking links to client proposals", "Create consultation scheduling pages", "Sync appointments to your calendar"],
+    availability: "professional",
+  },
+  docusign: {
+    id: "docusign", name: "DocuSign", description: "Send booking agreements and contracts for e-signature",
+    category: "finance", authType: "oauth2",
+    icon: "✍️", color: "bg-yellow-50",
+    whatItDoes: ["Send booking agreements to clients", "Get signed contracts in minutes", "Store signed documents automatically"],
+    availability: "professional",
+  },
+  quickbooks: {
+    id: "quickbooks", name: "QuickBooks", description: "Sync invoices and payments to your accounting",
+    category: "finance", authType: "oauth2",
+    icon: "📊", color: "bg-green-50",
+    whatItDoes: ["Create invoices in QuickBooks from proposals", "Sync payments automatically", "Track revenue by client or trip type"],
+    availability: "professional",
+  },
+  google_sheets: {
+    id: "google_sheets", name: "Google Sheets", description: "Export client lists, bookings, and data to spreadsheets",
+    category: "google", authType: "oauth2", oauthProvider: "google",
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    icon: "📈", color: "bg-green-50",
+    whatItDoes: ["Export client databases to Sheets", "Track bookings in a spreadsheet", "Build custom reports"],
+    availability: "professional",
+  },
+  slack: {
+    id: "slack", name: "Slack", description: "Get team notifications when tasks and workflows complete",
+    category: "communication", authType: "oauth2",
+    icon: "💬", color: "bg-purple-50",
+    whatItDoes: ["Notify your team when a proposal is ready", "Alert on new client enquiries", "Post workflow completion updates"],
+    availability: "professional",
+  },
+  typeform: {
+    id: "typeform", name: "Typeform", description: "Create client intake forms that feed into TripDesk",
+    category: "productivity", authType: "api_key",
+    icon: "📋", color: "bg-pink-50",
+    whatItDoes: ["Build client travel preference forms", "Auto-create client profiles from responses", "Collect trip requirements before calls"],
+    availability: "professional",
+  },
+  zoom: {
+    id: "zoom", name: "Zoom", description: "Auto-create meeting links for client consultations",
+    category: "communication", authType: "oauth2",
+    icon: "🎥", color: "bg-blue-50",
+    whatItDoes: ["Add Zoom links to client proposals", "Schedule consultation calls automatically", "Send meeting reminders to clients"],
+    availability: "professional",
+  },
+  expedia: {
+    id: "expedia", name: "Expedia Partner Central", description: "Research hotel pricing and packages via Expedia",
+    category: "booking", authType: "api_key",
+    icon: "🏨", color: "bg-yellow-50",
+    whatItDoes: ["Look up hotel availability and pricing", "Compare package deals", "Find flight + hotel combinations"],
+    availability: "professional",
+  },
+  hostelworld: {
+    id: "hostelworld", name: "Hostelworld", description: "Research budget and boutique accommodation options",
+    category: "booking", authType: "api_key",
+    icon: "🛏️", color: "bg-orange-50",
+    whatItDoes: ["Find budget accommodation for adventure clients", "Compare hostel and guesthouse options", "Check real-time availability"],
+    availability: "professional",
+  },
 
   // ── AGENCY ONLY ──────────────────────────────────────────────────────────
   travefy: {
@@ -223,6 +300,41 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     whatItDoes: ["List tours on TourRadar", "Manage bookings", "Sync availability"],
     availability: "agency",
   },
+  salesforce: {
+    id: "salesforce", name: "Salesforce", description: "Enterprise CRM for larger travel agencies and teams",
+    category: "productivity", authType: "oauth2",
+    icon: "☁️", color: "bg-blue-50",
+    whatItDoes: ["Sync all client and booking data to Salesforce", "Track enterprise sales pipelines", "Automate client follow-up workflows"],
+    availability: "agency",
+  },
+  monday: {
+    id: "monday", name: "Monday.com", description: "Project management for complex group tours and events",
+    category: "productivity", authType: "api_key",
+    icon: "📅", color: "bg-red-50",
+    whatItDoes: ["Track group tour production timelines", "Manage team tasks per departure", "Monitor booking milestones"],
+    availability: "agency",
+  },
+  xero: {
+    id: "xero", name: "Xero", description: "Accounting and invoicing for agencies with complex billing",
+    category: "finance", authType: "oauth2",
+    icon: "💰", color: "bg-teal-50",
+    whatItDoes: ["Sync invoices and payments to Xero", "Reconcile bookings with bank feeds", "Generate financial reports by tour"],
+    availability: "agency",
+  },
+  airtable: {
+    id: "airtable", name: "Airtable", description: "Build custom databases for tour inventory and operations",
+    category: "productivity", authType: "api_key",
+    icon: "🗃️", color: "bg-yellow-50",
+    whatItDoes: ["Build custom tour inventory databases", "Track supplier contacts and contracts", "Manage complex multi-departure schedules"],
+    availability: "agency",
+  },
+  zapier: {
+    id: "zapier", name: "Zapier", description: "Connect TripDesk to any app not natively supported",
+    category: "productivity", authType: "api_key",
+    icon: "⚡", color: "bg-orange-50",
+    whatItDoes: ["Connect TripDesk to 6,000+ apps", "Build custom automation flows", "Trigger actions in any tool when tasks complete"],
+    availability: "agency",
+  },
 };
 
 // Fixed 6 — always included regardless of tier
@@ -230,16 +342,25 @@ export const STARTER_CONNECTORS: ConnectorId[] = [
   "gmail", "google_drive", "google_calendar", "whatsapp", "canva", "skyscanner",
 ];
 
-// Available to pick from on Professional (choose up to 14)
+// Available to pick from on Professional (choose up to 14 from this list)
 export const PROFESSIONAL_LIBRARY: ConnectorId[] = [
-  "notion", "wordpress", "stripe", "booking_com", "mailchimp", "instagram",
-  "facebook", "viator", "tripadvisor", "airbnb", "google_docs", "trello",
-  "whatsapp_business", "rome2rio", "rezdy", "getyourguide", "klook",
+  // Travel & booking
+  "notion", "wordpress", "booking_com", "viator", "tripadvisor", "airbnb",
+  "getyourguide", "klook", "rezdy", "expedia", "hostelworld", "rome2rio",
+  // Marketing & social
+  "mailchimp", "instagram", "facebook",
+  // Productivity & CRM
+  "google_docs", "google_sheets", "trello", "hubspot", "typeform",
+  // Communication
+  "whatsapp_business", "slack", "zoom", "calendly",
+  // Finance & legal
+  "stripe", "quickbooks", "docusign",
 ];
 
 // Agency-only connectors (not available on lower tiers)
 export const AGENCY_ONLY: ConnectorId[] = [
   "travefy", "travel_joy", "peek_pro", "tourradar",
+  "salesforce", "monday", "xero", "airtable", "zapier",
 ];
 
 export const PROFESSIONAL_SLOT_LIMIT = 14;

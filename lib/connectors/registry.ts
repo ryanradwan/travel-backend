@@ -9,7 +9,12 @@ export type ConnectorId =
   | "slack" | "typeform" | "zoom" | "expedia" | "hostelworld"
   // Agency only
   | "travefy" | "travel_joy" | "peek_pro" | "tourradar"
-  | "salesforce" | "monday" | "xero" | "airtable" | "zapier";
+  | "salesforce" | "monday" | "xero" | "airtable" | "zapier"
+  // Agency only — travel-specific
+  | "amadeus" | "sabre" | "fareharbor" | "bokun" | "checkfront" | "trekksoft"
+  | "viator_supplier" | "getyourguide_supplier" | "musement" | "civitatis"
+  | "sherpa" | "allianz_travel" | "global_rescue" | "virtuoso" | "signature_travel"
+  | "sojern" | "umapped" | "tourplan" | "tourcms" | "headout";
 
 export type ConnectorTier = "starter" | "professional" | "agency";
 
@@ -17,7 +22,7 @@ export interface ConnectorDefinition {
   id: ConnectorId;
   name: string;
   description: string;
-  category: "google" | "communication" | "design" | "travel" | "booking" | "marketing" | "social" | "finance" | "productivity";
+  category: "google" | "communication" | "design" | "travel" | "booking" | "marketing" | "social" | "finance" | "productivity" | "gds";
   authType: "oauth2" | "api_key" | "manual";
   oauthProvider?: "google";
   scopes?: string[];
@@ -335,6 +340,248 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     whatItDoes: ["Connect TripDesk to 6,000+ apps", "Build custom automation flows", "Trigger actions in any tool when tasks complete"],
     availability: "agency",
   },
+
+  // ── AGENCY TRAVEL-SPECIFIC ───────────────────────────────────────────────
+  amadeus: {
+    id: "amadeus", name: "Amadeus GDS", description: "Live flight, hotel, and car inventory from the world's largest GDS",
+    category: "gds", authType: "api_key",
+    icon: "🌐", color: "bg-blue-50",
+    whatItDoes: [
+      "Search live flight inventory across all airlines",
+      "Book hotels with real-time availability and net rates",
+      "Pull accurate pricing into client proposals instantly",
+      "Access car rental and rail inventory worldwide",
+    ],
+    availability: "agency",
+  },
+  sabre: {
+    id: "sabre", name: "Sabre GDS", description: "Flight, hotel, and package booking via the Sabre global distribution system",
+    category: "gds", authType: "api_key",
+    icon: "✈️", color: "bg-red-50",
+    whatItDoes: [
+      "Book flights and hotels directly in Sabre",
+      "Access negotiated corporate and leisure fares",
+      "Pull PNR data into client itineraries automatically",
+      "Manage group bookings and seat blocks",
+    ],
+    availability: "agency",
+  },
+  fareharbor: {
+    id: "fareharbor", name: "FareHarbor", description: "Tour and activity booking management for operators",
+    category: "booking", authType: "api_key",
+    icon: "⛵", color: "bg-cyan-50",
+    whatItDoes: [
+      "Check real-time tour availability for client proposals",
+      "Create bookings and send confirmation emails",
+      "Manage waivers and customer documents",
+      "Sync capacity and pricing with your TripDesk packages",
+    ],
+    availability: "agency",
+  },
+  bokun: {
+    id: "bokun", name: "Bókun", description: "Viator-owned tour operator platform for inventory and distribution",
+    category: "booking", authType: "api_key",
+    icon: "🎡", color: "bg-green-50",
+    whatItDoes: [
+      "Manage your tour product inventory in Bókun",
+      "Distribute products to Viator, GetYourGuide, and OTAs",
+      "Pull live availability into TripDesk proposals",
+      "Process bookings and payments automatically",
+    ],
+    availability: "agency",
+  },
+  checkfront: {
+    id: "checkfront", name: "Checkfront", description: "Booking and reservation management for tour operators",
+    category: "booking", authType: "api_key",
+    icon: "📋", color: "bg-indigo-50",
+    whatItDoes: [
+      "Sync your tour inventory and availability",
+      "Create bookings from TripDesk proposals",
+      "Send automated booking confirmations",
+      "Manage customer waivers and documents",
+    ],
+    availability: "agency",
+  },
+  trekksoft: {
+    id: "trekksoft", name: "TrekkSoft", description: "Adventure and activity booking platform for tour operators",
+    category: "booking", authType: "api_key",
+    icon: "🏔️", color: "bg-green-50",
+    whatItDoes: [
+      "Manage adventure tour bookings and capacity",
+      "Distribute to global OTA channels",
+      "Handle guide assignments and resource management",
+      "Pull live pricing into client proposals",
+    ],
+    availability: "agency",
+  },
+  viator_supplier: {
+    id: "viator_supplier", name: "Viator Supplier", description: "Manage and optimise your listings on Viator",
+    category: "booking", authType: "api_key",
+    icon: "🗺️", color: "bg-orange-50",
+    whatItDoes: [
+      "Publish new tour products directly to Viator",
+      "Update pricing, photos, and descriptions",
+      "Monitor reviews and respond to feedback",
+      "Track bookings and revenue from Viator channel",
+    ],
+    availability: "agency",
+  },
+  getyourguide_supplier: {
+    id: "getyourguide_supplier", name: "GetYourGuide Supplier", description: "Manage your experience listings on GetYourGuide",
+    category: "booking", authType: "api_key",
+    icon: "🎯", color: "bg-red-50",
+    whatItDoes: [
+      "Publish and update tour products on GetYourGuide",
+      "Sync availability calendars automatically",
+      "Manage pricing and capacity in real time",
+      "Track performance and booking analytics",
+    ],
+    availability: "agency",
+  },
+  musement: {
+    id: "musement", name: "Musement", description: "European tours and museum experiences — TUI Group platform",
+    category: "booking", authType: "api_key",
+    icon: "🏛️", color: "bg-purple-50",
+    whatItDoes: [
+      "Source curated European cultural experiences",
+      "Add museum skip-the-line tickets to itineraries",
+      "Access exclusive TUI Group inventory",
+      "Book guided city tours across Europe",
+    ],
+    availability: "agency",
+  },
+  civitatis: {
+    id: "civitatis", name: "Civitatis", description: "Spanish-language tour marketplace — dominant in Latin America",
+    category: "booking", authType: "api_key",
+    icon: "🌎", color: "bg-yellow-50",
+    whatItDoes: [
+      "Source experiences for Spanish-speaking clients",
+      "Find tours across Latin America and Spain",
+      "Add Spanish-language options to proposals",
+      "Access exclusive inventory for LATAM destinations",
+    ],
+    availability: "agency",
+  },
+  sherpa: {
+    id: "sherpa", name: "Sherpa° (Entry Requirements)", description: "Real-time visa, entry, and health requirement data for every country",
+    category: "travel", authType: "api_key",
+    icon: "🛂", color: "bg-teal-50",
+    whatItDoes: [
+      "Get live visa requirements for any passport + destination",
+      "Check health certificates, COVID requirements, and entry rules",
+      "Auto-populate visa sections of every client proposal",
+      "Receive alerts when entry requirements change",
+    ],
+    availability: "agency",
+  },
+  allianz_travel: {
+    id: "allianz_travel", name: "Allianz Travel Insurance", description: "Embed travel insurance quotes directly into client proposals",
+    category: "travel", authType: "api_key",
+    icon: "🛡️", color: "bg-blue-50",
+    whatItDoes: [
+      "Generate travel insurance quotes from within TripDesk",
+      "Embed insurance options in client proposals",
+      "Track which clients have purchased coverage",
+      "Earn commission on policies sold",
+    ],
+    availability: "agency",
+  },
+  global_rescue: {
+    id: "global_rescue", name: "Global Rescue", description: "Emergency evacuation and rescue membership for high-risk destinations",
+    category: "travel", authType: "api_key",
+    icon: "🚁", color: "bg-red-50",
+    whatItDoes: [
+      "Add emergency evacuation options to adventure proposals",
+      "Recommend memberships for remote or high-risk itineraries",
+      "Track which clients have active Global Rescue memberships",
+      "Include rescue coverage details in pre-departure documents",
+    ],
+    availability: "agency",
+  },
+  virtuoso: {
+    id: "virtuoso", name: "Virtuoso Network", description: "Access exclusive luxury amenities, upgrades, and preferred rates",
+    category: "travel", authType: "manual",
+    icon: "💎", color: "bg-yellow-50",
+    whatItDoes: [
+      "Access Virtuoso preferred rates and amenity programs",
+      "Add hotel upgrades and inclusions to luxury proposals",
+      "Pull Virtuoso-exclusive itineraries into TripDesk",
+      "Track VIP amenities confirmed at each property",
+    ],
+    availability: "agency",
+  },
+  signature_travel: {
+    id: "signature_travel", name: "Signature Travel Network", description: "Preferred partner program with exclusive hotel and cruise amenities",
+    category: "travel", authType: "manual",
+    icon: "🏆", color: "bg-amber-50",
+    whatItDoes: [
+      "Access Signature preferred rates and amenities",
+      "Add exclusive onboard credits and upgrades to proposals",
+      "Track Signature partner bookings and commissions",
+      "Pull preferred supplier inventory into TripDesk",
+    ],
+    availability: "agency",
+  },
+  sojern: {
+    id: "sojern", name: "Sojern", description: "Travel intent data and digital advertising for tour operators",
+    category: "marketing", authType: "api_key",
+    icon: "📡", color: "bg-purple-50",
+    whatItDoes: [
+      "Target travellers actively searching your destinations",
+      "Retarget website visitors with tour package ads",
+      "Track which marketing channels drive bookings",
+      "Build lookalike audiences from your best clients",
+    ],
+    availability: "agency",
+  },
+  umapped: {
+    id: "umapped", name: "Umapped", description: "Beautiful shareable itineraries your clients can access on any device",
+    category: "travel", authType: "api_key",
+    icon: "🗺️", color: "bg-teal-50",
+    whatItDoes: [
+      "Publish TripDesk itineraries as interactive client-facing documents",
+      "Share real-time updates with clients during their trip",
+      "Add maps, photos, and supplier details",
+      "Clients can access their trip offline on mobile",
+    ],
+    availability: "agency",
+  },
+  tourplan: {
+    id: "tourplan", name: "Tourplan", description: "Enterprise tour operator software for complex FIT and group operations",
+    category: "booking", authType: "api_key",
+    icon: "🏢", color: "bg-gray-50",
+    whatItDoes: [
+      "Sync bookings between TripDesk and Tourplan",
+      "Manage FIT and group costing automatically",
+      "Pull supplier contracts and net rates into proposals",
+      "Handle complex multi-component tour operations",
+    ],
+    availability: "agency",
+  },
+  tourcms: {
+    id: "tourcms", name: "TourCMS", description: "Channel management and booking system for tour operators",
+    category: "booking", authType: "api_key",
+    icon: "📡", color: "bg-blue-50",
+    whatItDoes: [
+      "Distribute your tours to 250+ OTA channels",
+      "Sync availability and pricing across all channels",
+      "Manage bookings from all channels in one place",
+      "Pull live availability into TripDesk proposals",
+    ],
+    availability: "agency",
+  },
+  headout: {
+    id: "headout", name: "Headout", description: "Last-minute experiences and tickets for major global cities",
+    category: "booking", authType: "api_key",
+    icon: "🎭", color: "bg-pink-50",
+    whatItDoes: [
+      "Find last-minute show and experience tickets",
+      "Add city experiences to itineraries with real-time pricing",
+      "Source hard-to-get attraction tickets",
+      "Offer flexible no-cancellation-fee options to clients",
+    ],
+    availability: "agency",
+  },
 };
 
 // Fixed 6 — always included regardless of tier
@@ -359,8 +606,18 @@ export const PROFESSIONAL_LIBRARY: ConnectorId[] = [
 
 // Agency-only connectors (not available on lower tiers)
 export const AGENCY_ONLY: ConnectorId[] = [
+  // General business (carried over)
   "travefy", "travel_joy", "peek_pro", "tourradar",
   "salesforce", "monday", "xero", "airtable", "zapier",
+  // Travel-specific agency tools
+  "amadeus", "sabre",                           // GDS
+  "fareharbor", "bokun", "checkfront", "trekksoft", "tourplan", "tourcms", // Tour ops
+  "viator_supplier", "getyourguide_supplier",   // OTA supplier portals
+  "musement", "civitatis", "headout",           // Experience sourcing
+  "sherpa", "allianz_travel", "global_rescue",  // Travel services
+  "virtuoso", "signature_travel",               // Luxury consortia
+  "sojern",                                     // Travel marketing
+  "umapped",                                    // Client-facing itineraries
 ];
 
 export const PROFESSIONAL_SLOT_LIMIT = 14;

@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import UsageCard from "@/components/dashboard/UsageCard";
 import QuickActions from "@/components/dashboard/QuickActions";
 import RecentTasks from "@/components/dashboard/RecentTasks";
 import ConnectorStatus from "@/components/dashboard/ConnectorStatus";
+import TravelAdvisoryFeed from "@/components/dashboard/TravelAdvisoryFeed";
 import { type Task, type TaskUsage, type Connector } from "@/types/database";
 
 export default async function DashboardPage() {
@@ -13,19 +15,14 @@ export default async function DashboardPage() {
 
   const month = new Date().toISOString().slice(0, 7);
 
-  const [
-    userResult,
-    profileResult,
-    usageResult,
-    tasksResult,
-    connectorsResult,
-  ] = await Promise.all([
-    supabase.from("users").select("subscription_tier").eq("id", user.id).single(),
-    supabase.from("business_profiles").select("business_name").eq("user_id", user.id).single(),
-    supabase.from("task_usage").select("*").eq("user_id", user.id).eq("month", month).single(),
-    supabase.from("tasks").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
-    supabase.from("connectors").select("*").eq("user_id", user.id),
-  ]);
+  const [userResult, profileResult, usageResult, tasksResult, connectorsResult] =
+    await Promise.all([
+      supabase.from("users").select("subscription_tier").eq("id", user.id).single(),
+      supabase.from("business_profiles").select("business_name").eq("user_id", user.id).single(),
+      supabase.from("task_usage").select("*").eq("user_id", user.id).eq("month", month).single(),
+      supabase.from("tasks").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
+      supabase.from("connectors").select("*").eq("user_id", user.id),
+    ]);
 
   const userData = userResult.data as { subscription_tier: string } | null;
   const profile = profileResult.data as { business_name: string } | null;
@@ -50,14 +47,34 @@ export default async function DashboardPage() {
       <QuickActions />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+        {/* Left column — recent tasks + advisory feed */}
+        <div className="lg:col-span-2 space-y-6">
           <RecentTasks tasks={tasks} />
+          <Suspense fallback={<AdvisoryFeedSkeleton />}>
+            <TravelAdvisoryFeed />
+          </Suspense>
         </div>
+
+        {/* Right column — usage + connectors */}
         <div className="space-y-6">
           <UsageCard usage={usage} tier={tier} />
           <ConnectorStatus connectors={connectors} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function AdvisoryFeedSkeleton() {
+  return (
+    <div className="card animate-pulse">
+      <div className="h-4 bg-gray-100 rounded w-1/3 mb-4" />
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex justify-between py-2">
+          <div className="h-3 bg-gray-100 rounded w-1/2" />
+          <div className="h-3 bg-gray-100 rounded w-8" />
+        </div>
+      ))}
     </div>
   );
 }

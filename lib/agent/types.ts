@@ -11,6 +11,7 @@ export interface BusinessProfile {
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  isTask?: boolean;   // true = counted against quota, false = free question
 }
 
 export type WorkflowType = "itinerary" | "research" | "package" | "general";

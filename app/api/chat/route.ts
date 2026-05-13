@@ -4,6 +4,7 @@ import { buildSystemPrompt } from "@/lib/agent/system-prompt";
 import { getMemoryContext, extractAndSaveMemories } from "@/lib/agent/memory";
 import { requiresComplianceCheck, detectDestination, buildComplianceBlock } from "@/lib/agent/compliance";
 import { checkTaskQuota, createTask, completeTask, failTask } from "@/lib/agent/tasks";
+import { classifyIntent } from "@/lib/agent/intent";
 import { type ChatMessage } from "@/lib/agent/types";
 
 export const runtime = "nodejs";
@@ -34,13 +35,21 @@ export async function POST(req: Request) {
     return Response.json({ error: "Messages are required" }, { status: 400 });
   }
 
-  // Pre-flight: check task quota
-  const quota = await checkTaskQuota(user.id);
-  if (!quota.allowed) {
-    const msg = quota.limit === -1
-      ? "Your account access has been paused. Please check your billing settings."
-      : `You've used all ${quota.limit} tasks for this month. Upgrade your plan or add top-up credits to continue.`;
-    return Response.json({ error: msg }, { status: 402 });
+  const userInput = messages[messages.length - 1].content;
+
+  // Classify intent — questions are free, tasks count against the monthly limit
+  const intent = classifyIntent(userInput);
+  const isBillableTask = intent === "task" || (workflow !== "general");
+
+  // Only check quota for billable tasks
+  if (isBillableTask) {
+    const quota = await checkTaskQuota(user.id);
+    if (!quota.allowed) {
+      const msg = quota.limit === -1
+        ? "Your account access has been paused. Please check your billing settings."
+        : `You've used all ${quota.limit} tasks for this month. Upgrade your plan or add top-up credits to continue.`;
+      return Response.json({ error: msg }, { status: 402 });
+    }
   }
 
   // Load business profile and memory context
@@ -59,19 +68,19 @@ export async function POST(req: Request) {
     years_in_business: number;
   } | null;
 
-  const userInput = messages[messages.length - 1].content;
   const needsCompliance = requiresComplianceCheck(userInput);
   const destination = needsCompliance ? detectDestination(userInput) : null;
 
-  // Create task record
-  const taskId = await createTask(user.id, userInput, workflow);
-  if (!taskId) {
-    return Response.json({ error: "Failed to create task. Please try again." }, { status: 500 });
+  // Only create a task record for billable tasks
+  let taskId: string | null = null;
+  if (isBillableTask) {
+    taskId = await createTask(user.id, userInput, workflow);
+    if (!taskId) {
+      return Response.json({ error: "Failed to start task. Please try again." }, { status: 500 });
+    }
   }
 
   const systemPrompt = buildSystemPrompt(profile, memoryContext, needsCompliance);
-
-  // Build the streaming response
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -86,14 +95,14 @@ export async function POST(req: Request) {
           content: m.content,
         }));
 
-        const stream = anthropic.messages.stream({
+        const claudeStream = anthropic.messages.stream({
           model: "claude-sonnet-4-6",
           max_tokens: 4096,
           system: systemPrompt,
           messages: claudeMessages,
         });
 
-        for await (const chunk of stream) {
+        for await (const chunk of claudeStream) {
           if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
             const text = chunk.delta.text;
             fullResponse += text;
@@ -107,32 +116,34 @@ export async function POST(req: Request) {
           }
         }
 
-        // Append compliance block if needed
+        // Append compliance block on travel-related outputs
         if (needsCompliance && destination) {
           const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-          const complianceBlock = buildComplianceBlock(destination, null, false, today);
-          const complianceText = complianceBlock.fullBlock;
+          const complianceText = buildComplianceBlock(destination, null, false, today).fullBlock;
           fullResponse += complianceText;
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "text", text: complianceText })}\n\n`));
         }
 
         const totalTokens = inputTokens + outputTokens;
 
-        // Complete task and deduct usage
-        await completeTask(taskId, user.id, fullResponse, totalTokens);
-
-        // Save memories in background
-        extractAndSaveMemories(user.id, taskId, userInput, fullResponse).catch(() => {});
-
-        // Send task_id so client can link to history
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", taskId, tokensUsed: totalTokens })}\n\n`));
+        if (isBillableTask && taskId) {
+          // Complete task and deduct 1 from monthly usage
+          await completeTask(taskId, user.id, fullResponse, totalTokens);
+          extractAndSaveMemories(user.id, taskId, userInput, fullResponse).catch(() => {});
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", taskId, isTask: true, tokensUsed: totalTokens })}\n\n`));
+        } else {
+          // Question — no usage charged, no task record
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", isTask: false })}\n\n`));
+        }
 
       } catch (error) {
         const errMsg = error instanceof Error ? error.message : "Unknown error";
-        await failTask(taskId, errMsg);
 
-        const friendlyError = getFriendlyError(errMsg);
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", error: friendlyError })}\n\n`));
+        if (isBillableTask && taskId) {
+          await failTask(taskId, errMsg);
+        }
+
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", error: getFriendlyError(errMsg) })}\n\n`));
       } finally {
         controller.close();
       }
@@ -161,5 +172,5 @@ function getFriendlyError(error: string): string {
   if (error.includes("API key") || error.includes("authentication")) {
     return "There's a configuration issue. Please contact support.";
   }
-  return "Something went wrong processing your request. Your task usage was not charged. Please try again.";
+  return "Something went wrong. Your task usage was not charged. Please try again.";
 }

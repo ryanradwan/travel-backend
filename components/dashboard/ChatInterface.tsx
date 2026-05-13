@@ -110,9 +110,19 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
                 };
                 return updated;
               });
+            } else if (event.type === "done") {
+              // Mark the assistant message with task/question status
+              setMessages((prev) => {
+                const updated = [...prev];
+                updated[updated.length - 1] = {
+                  ...updated[updated.length - 1],
+                  isTask: event.isTask ?? false,
+                };
+                return updated;
+              });
             } else if (event.type === "error") {
               setError(event.error);
-              setMessages((prev) => prev.slice(0, -1)); // remove empty assistant msg
+              setMessages((prev) => prev.slice(0, -1));
             }
           } catch {
             // partial chunk, ignore
@@ -320,7 +330,7 @@ function MessageBubble({
         </div>
 
         {!isUser && message.content && (
-          <div className="flex items-center gap-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-3 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={onCopy}
               className="flex items-center gap-1 text-xs text-gray-400 hover:text-navy transition-colors"
@@ -328,6 +338,15 @@ function MessageBubble({
               {isCopied ? <CheckCheck size={12} className="text-green-500" /> : <Copy size={12} />}
               {isCopied ? "Copied" : "Copy"}
             </button>
+            {message.isTask !== undefined && (
+              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                message.isTask
+                  ? "bg-teal/10 text-teal"
+                  : "bg-gray-100 text-gray-400"
+              }`}>
+                {message.isTask ? "1 task used" : "Free question"}
+              </span>
+            )}
           </div>
         )}
       </div>

@@ -1,23 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --navy: #0B2D56;
+  --teal: #0E7C7B;
+  --background: #F4F7FA;
+  --border: #D0DDE8;
+  --foreground: #1A2B3C;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--navy);
+    font-weight: 600;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .btn-primary {
+    @apply bg-navy text-white px-4 py-2 rounded font-medium hover:bg-navy-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-teal {
+    @apply bg-teal text-white px-4 py-2 rounded font-medium hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-outline {
+    @apply border border-navy text-navy px-4 py-2 rounded font-medium hover:bg-navy hover:text-white transition-colors;
+  }
+  .card {
+    @apply bg-white rounded-card shadow-card border border-border p-6;
+  }
+  .input {
+    @apply w-full px-3 py-2 border border-border rounded bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent transition-colors;
+  }
+  .label {
+    @apply block text-sm font-medium text-navy mb-1;
+  }
+  .badge-green {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800;
+  }
+  .badge-red {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800;
+  }
+  .badge-yellow {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800;
+  }
 }
 
 @layer utilities {

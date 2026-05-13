@@ -117,7 +117,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     category: "marketing", authType: "api_key",
     icon: "📧", color: "bg-yellow-50",
     whatItDoes: ["Draft tour launch campaigns", "Send to subscriber segments", "Track open rates"],
-    availability: "professional",
+    availability: "starter",
   },
   instagram: {
     id: "instagram", name: "Instagram", description: "Schedule and post tour announcements",
@@ -160,7 +160,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     scopes: ["https://www.googleapis.com/auth/documents"],
     icon: "📝", color: "bg-blue-50",
     whatItDoes: ["Create formatted itinerary documents", "Build proposal templates", "Generate client-ready PDFs"],
-    availability: "professional",
+    availability: "starter",
   },
   trello: {
     id: "trello", name: "Trello", description: "Track bookings and client progress on Trello boards",
@@ -586,7 +586,8 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
 
 // Fixed 6 — always included regardless of tier
 export const STARTER_CONNECTORS: ConnectorId[] = [
-  "gmail", "google_drive", "google_calendar", "whatsapp", "canva", "skyscanner",
+  "gmail", "google_drive", "google_calendar", "google_docs",
+  "whatsapp", "canva", "skyscanner", "mailchimp",
 ];
 
 // Available to pick from on Professional (choose up to 14 from this list)
@@ -595,9 +596,9 @@ export const PROFESSIONAL_LIBRARY: ConnectorId[] = [
   "notion", "wordpress", "booking_com", "viator", "tripadvisor", "airbnb",
   "getyourguide", "klook", "rezdy", "expedia", "hostelworld", "rome2rio",
   // Marketing & social
-  "mailchimp", "instagram", "facebook",
+  "instagram", "facebook",
   // Productivity & CRM
-  "google_docs", "google_sheets", "trello", "hubspot", "typeform",
+  "google_sheets", "trello", "hubspot", "typeform",
   // Communication
   "whatsapp_business", "slack", "zoom", "calendly",
   // Finance & legal
@@ -620,7 +621,7 @@ export const AGENCY_ONLY: ConnectorId[] = [
   "umapped",                                    // Client-facing itineraries
 ];
 
-export const PROFESSIONAL_SLOT_LIMIT = 14;
+export const PROFESSIONAL_SLOT_LIMIT = 12; // 8 Starter fixed + 12 chosen = 20 total
 
 export function getConnectorLimits(tier: string): {
   starterFixed: ConnectorId[];

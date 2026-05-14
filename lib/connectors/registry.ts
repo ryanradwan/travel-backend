@@ -1,12 +1,13 @@
 export type ConnectorId =
-  // Starter (6 fixed)
-  | "gmail" | "google_drive" | "google_calendar" | "whatsapp" | "canva" | "skyscanner"
-  // Professional library (choose up to 14)
-  | "notion" | "wordpress" | "stripe" | "booking_com" | "mailchimp" | "instagram"
-  | "facebook" | "viator" | "tripadvisor" | "airbnb" | "google_docs" | "trello"
+  // Starter (8 fixed)
+  | "gmail" | "google_drive" | "google_calendar" | "google_docs" | "whatsapp" | "canva" | "skyscanner" | "mailchimp"
+  // Professional library (choose up to 12 from 30)
+  | "notion" | "wordpress" | "stripe" | "booking_com" | "instagram"
+  | "facebook" | "viator" | "tripadvisor" | "airbnb" | "trello"
   | "whatsapp_business" | "rome2rio" | "rezdy" | "getyourguide" | "klook"
   | "hubspot" | "calendly" | "docusign" | "quickbooks" | "google_sheets"
   | "slack" | "typeform" | "zoom" | "expedia" | "hostelworld"
+  | "pipedrive" | "asana" | "linkedin" | "loom" | "activecampaign"
   // Agency only
   | "travefy" | "travel_joy" | "peek_pro" | "tourradar"
   | "salesforce" | "monday" | "xero" | "airtable" | "zapier"
@@ -14,7 +15,8 @@ export type ConnectorId =
   | "amadeus" | "sabre" | "fareharbor" | "bokun" | "checkfront" | "trekksoft"
   | "viator_supplier" | "getyourguide_supplier" | "musement" | "civitatis"
   | "sherpa" | "allianz_travel" | "global_rescue" | "virtuoso" | "signature_travel"
-  | "sojern" | "umapped" | "tourplan" | "tourcms" | "headout";
+  | "sojern" | "umapped" | "tourplan" | "tourcms" | "headout"
+  | "travelport" | "wetu" | "ratehawk" | "tourwriter" | "bedsonline";
 
 export type ConnectorTier = "starter" | "professional" | "agency";
 
@@ -582,6 +584,130 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     ],
     availability: "agency",
   },
+
+  // ── PROFESSIONAL ADDITIONS ───────────────────────────────────────────────
+  pipedrive: {
+    id: "pipedrive", name: "Pipedrive", description: "CRM built for sales — track leads, deals, and client pipeline",
+    category: "productivity", authType: "api_key",
+    icon: "🔁", color: "bg-green-50",
+    whatItDoes: [
+      "Log new client enquiries directly into your sales pipeline",
+      "Track deal stages from first enquiry to confirmed booking",
+      "Set follow-up reminders for proposals sent",
+      "Sync client notes and trip history to your CRM",
+    ],
+    availability: "professional",
+  },
+  asana: {
+    id: "asana", name: "Asana", description: "Project management for coordinating group trips and team tasks",
+    category: "productivity", authType: "oauth2",
+    icon: "✅", color: "bg-pink-50",
+    whatItDoes: [
+      "Create project boards for complex group tour operations",
+      "Assign tasks to team members for each booking",
+      "Track supplier confirmations, deposits, and deadlines",
+      "Manage pre-departure checklists automatically",
+    ],
+    availability: "professional",
+  },
+  linkedin: {
+    id: "linkedin", name: "LinkedIn", description: "Professional networking and B2B lead generation for travel businesses",
+    category: "social", authType: "oauth2",
+    icon: "💼", color: "bg-blue-50",
+    whatItDoes: [
+      "Publish destination content and travel insights",
+      "Share tour package launches to your professional network",
+      "Draft thought-leadership posts about travel trends",
+      "Generate B2B leads from corporate travel clients",
+    ],
+    availability: "professional",
+  },
+  loom: {
+    id: "loom", name: "Loom", description: "Record and share video proposals and destination previews for clients",
+    category: "communication", authType: "api_key",
+    icon: "🎬", color: "bg-violet-50",
+    whatItDoes: [
+      "Record personalised video walk-throughs of itinerary proposals",
+      "Create short destination preview videos for clients",
+      "Send video follow-ups after client consultations",
+      "Attach Loom videos to proposal emails automatically",
+    ],
+    availability: "professional",
+  },
+  activecampaign: {
+    id: "activecampaign", name: "ActiveCampaign", description: "Advanced email marketing automation and CRM for client nurturing",
+    category: "marketing", authType: "api_key",
+    icon: "⚡", color: "bg-blue-50",
+    whatItDoes: [
+      "Build automated drip sequences for new client enquiries",
+      "Segment clients by destination interest and travel history",
+      "Trigger post-trip follow-up sequences automatically",
+      "Create booking anniversary and birthday campaigns",
+    ],
+    availability: "professional",
+  },
+
+  // ── AGENCY ADDITIONS ─────────────────────────────────────────────────────
+  travelport: {
+    id: "travelport", name: "Travelport (Galileo/Apollo)", description: "Third major GDS — Galileo and Apollo booking systems for full NDC content",
+    category: "gds", authType: "api_key",
+    icon: "🌐", color: "bg-indigo-50",
+    whatItDoes: [
+      "Search and book flights via Galileo and Apollo GDS",
+      "Access full NDC airline content and ancillaries",
+      "Pull live availability into TripDesk proposals",
+      "Complement Amadeus and Sabre for full market coverage",
+    ],
+    availability: "agency",
+  },
+  wetu: {
+    id: "wetu", name: "Wetu", description: "Interactive itinerary software used by luxury and high-end tour operators",
+    category: "productivity", authType: "api_key",
+    icon: "🗺️", color: "bg-emerald-50",
+    whatItDoes: [
+      "Publish TripDesk itineraries as stunning visual Wetu presentations",
+      "Share interactive day-by-day itineraries with clients",
+      "Include accommodation photos, maps, and supplier details",
+      "Generate PDF and digital versions from one itinerary",
+    ],
+    availability: "agency",
+  },
+  ratehawk: {
+    id: "ratehawk", name: "RateHawk", description: "B2B travel platform with wholesale hotel and flight rates for agents",
+    category: "booking", authType: "api_key",
+    icon: "🦅", color: "bg-orange-50",
+    whatItDoes: [
+      "Access wholesale hotel rates from 2M+ properties worldwide",
+      "Compare B2B rates across multiple suppliers instantly",
+      "Book accommodation directly within TripDesk workflows",
+      "Pull net rates into client proposals with your markup",
+    ],
+    availability: "agency",
+  },
+  tourwriter: {
+    id: "tourwriter", name: "Tourwriter", description: "Premium itinerary building and costing software for luxury operators",
+    category: "productivity", authType: "api_key",
+    icon: "✍️", color: "bg-amber-50",
+    whatItDoes: [
+      "Export TripDesk itineraries into Tourwriter for costing",
+      "Build detailed margin calculations on complex FIT trips",
+      "Generate professional branded proposal documents",
+      "Manage supplier rate cards and seasonal pricing",
+    ],
+    availability: "agency",
+  },
+  bedsonline: {
+    id: "bedsonline", name: "Bedsonline", description: "Wholesale accommodation booking platform by Hotelbeds for travel agents",
+    category: "booking", authType: "api_key",
+    icon: "🛏️", color: "bg-teal-50",
+    whatItDoes: [
+      "Access 185,000+ hotels at contracted agent-only rates",
+      "Search and book accommodation within TripDesk proposals",
+      "Pull live availability and net rates into itineraries",
+      "Access exclusive deals and last-minute availability",
+    ],
+    availability: "agency",
+  },
 };
 
 // Fixed 6 — always included regardless of tier
@@ -598,11 +724,13 @@ export const PROFESSIONAL_LIBRARY: ConnectorId[] = [
   // Marketing & social
   "instagram", "facebook",
   // Productivity & CRM
-  "google_sheets", "trello", "hubspot", "typeform",
+  "google_sheets", "trello", "hubspot", "typeform", "pipedrive", "asana",
   // Communication
-  "whatsapp_business", "slack", "zoom", "calendly",
+  "whatsapp_business", "slack", "zoom", "calendly", "loom",
   // Finance & legal
   "stripe", "quickbooks", "docusign",
+  // Marketing & outreach
+  "linkedin", "activecampaign",
 ];
 
 // Agency-only connectors (not available on lower tiers)
@@ -619,6 +747,7 @@ export const AGENCY_ONLY: ConnectorId[] = [
   "virtuoso", "signature_travel",               // Luxury consortia
   "sojern",                                     // Travel marketing
   "umapped",                                    // Client-facing itineraries
+  "travelport", "wetu", "ratehawk", "tourwriter", "bedsonline", // New additions
 ];
 
 export const PROFESSIONAL_SLOT_LIMIT = 12; // 8 Starter fixed + 12 chosen = 20 total

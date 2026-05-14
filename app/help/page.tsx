@@ -52,7 +52,7 @@ const FAQ = [
       },
       {
         q: "How many connectors do I get?",
-        a: "Starter: 8 fixed connectors (Gmail, Google Drive, Google Calendar, Google Docs, WhatsApp, Canva, Skyscanner, Mailchimp). Professional: 8 fixed + choose any 12 from a library of 25 = 20 active. Agency: Unlimited across all 62 available connectors.",
+        a: "Starter: 8 fixed connectors (Gmail, Google Drive, Google Calendar, Google Docs, WhatsApp, Canva, Skyscanner, Mailchimp). Professional: 8 fixed + choose any 12 from a library of 30 = 20 active. Agency: Unlimited across all connectors.",
       },
       {
         q: "A connector says it needs reconnecting — what do I do?",

@@ -18,6 +18,7 @@ import {
   Globe,
   Package,
   Puzzle,
+  TrendingUp,
 } from "lucide-react";
 
 const nav = [
@@ -26,6 +27,7 @@ const nav = [
   { href: "/dashboard/workflows/itinerary", label: "Client Itinerary", icon: FileText },
   { href: "/dashboard/workflows/research", label: "Destination Report", icon: Globe },
   { href: "/dashboard/workflows/package", label: "Tour Package", icon: Package },
+  { href: "/dashboard/pipeline", label: "Pipeline", icon: TrendingUp },
   { href: "/dashboard/clients", label: "Clients", icon: Users },
   { href: "/dashboard/tasks", label: "Task History", icon: Clock },
   { href: "/dashboard/templates", label: "Templates", icon: BookOpen },

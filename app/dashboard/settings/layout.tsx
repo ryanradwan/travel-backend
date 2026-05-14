@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const settingsNav = [
   { href: "/dashboard/settings", label: "Profile" },
+  { href: "/dashboard/settings/brand", label: "Brand & PDF" },
   { href: "/dashboard/settings/billing", label: "Billing & Plan" },
   { href: "/dashboard/settings/team", label: "Team" },
 ];

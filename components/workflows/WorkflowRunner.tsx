@@ -5,6 +5,7 @@ import { CheckCircle2, Circle, Loader2, SkipForward, Copy, CheckCheck } from "lu
 import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import { WORKFLOWS, type WorkflowId } from "@/lib/workflows/definitions";
+import ProposalActions from "@/components/proposals/ProposalActions";
 
 interface StepState {
   status: "pending" | "running" | "complete" | "skipped";
@@ -21,6 +22,7 @@ export default function WorkflowRunner({ workflowId }: WorkflowRunnerProps) {
   const [input, setInput] = useState("");
   const [steps, setSteps] = useState<Record<number, StepState>>({});
   const [finalOutput, setFinalOutput] = useState("");
+  const [taskId, setTaskId] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -94,6 +96,7 @@ export default function WorkflowRunner({ workflowId }: WorkflowRunnerProps) {
 
               case "done":
                 setPhase("done");
+                if (event.taskId) setTaskId(event.taskId);
                 break;
 
               case "error":
@@ -293,6 +296,9 @@ export default function WorkflowRunner({ workflowId }: WorkflowRunnerProps) {
                   return <p key={i} className="text-sm leading-relaxed">{block}</p>;
                 })}
               </div>
+            )}
+            {finalOutput && phase === "done" && (
+              <ProposalActions content={finalOutput} taskId={taskId} />
             )}
           </div>
         </div>

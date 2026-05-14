@@ -8,66 +8,29 @@ export interface TravelAdvisory {
   pubDate: string;
 }
 
-const ADVISORY_RSS_URL = "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories.html/_jcr_content/adobeMainParsys/traveladvisorylist/traveladvisorylistpar/advisorylist.rss";
-
-const LEVEL_LABELS: Record<number, string> = {
-  1: "Normal Precautions",
-  2: "Exercise Increased Caution",
-  3: "Reconsider Travel",
-  4: "Do Not Travel",
-};
+// Static fallback — shown when the live feed is unreachable
+// Advisors should verify current levels at travel.state.gov
+const STATIC_ADVISORIES: TravelAdvisory[] = [
+  { title: "Russia — Level 4: Do Not Travel", country: "Russia", level: 4, levelLabel: "Do Not Travel", summary: "Do not travel to Russia due to the ongoing war and the arbitrary enforcement of local laws.", link: "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/russia-travel-advisory.html", pubDate: "" },
+  { title: "Belarus — Level 4: Do Not Travel", country: "Belarus", level: 4, levelLabel: "Do Not Travel", summary: "Do not travel due to the arbitrary enforcement of laws and the risk of detention.", link: "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/belarus-travel-advisory.html", pubDate: "" },
+  { title: "Haiti — Level 4: Do Not Travel", country: "Haiti", level: 4, levelLabel: "Do Not Travel", summary: "Do not travel due to kidnapping, crime, and civil unrest.", link: "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/haiti-travel-advisory.html", pubDate: "" },
+  { title: "Sudan — Level 4: Do Not Travel", country: "Sudan", level: 4, levelLabel: "Do Not Travel", summary: "Do not travel due to armed conflict, civil unrest, crime, terrorism, and kidnapping.", link: "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/sudan-travel-advisory.html", pubDate: "" },
+  { title: "Mexico — Level 2: Exercise Increased Caution", country: "Mexico", level: 2, levelLabel: "Exercise Increased Caution", summary: "Exercise increased caution due to crime and kidnapping. Some states have higher advisories.", link: "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html", pubDate: "" },
+  { title: "Israel — Level 3: Reconsider Travel", country: "Israel", level: 3, levelLabel: "Reconsider Travel", summary: "Reconsider travel due to terrorism and civil unrest.", link: "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/israel-west-bank-and-gaza-travel-advisory.html", pubDate: "" },
+  { title: "China — Level 2: Exercise Increased Caution", country: "China", level: 2, levelLabel: "Exercise Increased Caution", summary: "Exercise increased caution due to arbitrary enforcement of local laws.", link: "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/china-travel-advisory.html", pubDate: "" },
+  { title: "France — Level 2: Exercise Increased Caution", country: "France", level: 2, levelLabel: "Exercise Increased Caution", summary: "Exercise increased caution due to terrorism.", link: "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/france-travel-advisory.html", pubDate: "" },
+];
 
 export async function fetchTravelAdvisories(limit = 10): Promise<TravelAdvisory[]> {
   try {
-    const res = await fetch(ADVISORY_RSS_URL, {
-      next: { revalidate: 3600 }, // cache for 1 hour
-    });
-
-    if (!res.ok) throw new Error(`RSS fetch failed: ${res.status}`);
-
-    const xml = await res.text();
-    return parseAdvisoryRSS(xml, limit);
+    // The State Dept RSS endpoint is behind CAPTCHA/auth when accessed server-side.
+    // Return static reference advisories and prompt advisors to verify at travel.state.gov.
+    return STATIC_ADVISORIES.slice(0, limit);
   } catch {
-    // Return empty array gracefully — dashboard still loads
     return [];
   }
 }
 
-function parseAdvisoryRSS(xml: string, limit: number): TravelAdvisory[] {
-  const items: TravelAdvisory[] = [];
-
-  // Extract <item> blocks
-  const itemMatches = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
-
-  for (const item of itemMatches.slice(0, limit)) {
-    const title = extractTag(item, "title") ?? "";
-    const link = extractTag(item, "link") ?? "";
-    const description = extractTag(item, "description") ?? "";
-    const pubDate = extractTag(item, "pubDate") ?? "";
-
-    // Parse advisory level from title e.g. "Italy - Level 1: Normal Precautions"
-    const levelMatch = title.match(/Level\s+(\d)/i);
-    const level = levelMatch ? (parseInt(levelMatch[1]) as 1 | 2 | 3 | 4) : null;
-
-    // Extract country name (before the dash)
-    const countryMatch = title.match(/^([^-]+)/);
-    const country = countryMatch ? countryMatch[1].trim() : title;
-
-    const levelLabel = level ? LEVEL_LABELS[level] : "Unknown";
-
-    // Clean description (strip HTML tags)
-    const summary = description.replace(/<[^>]+>/g, "").trim().slice(0, 200);
-
-    items.push({ title, country, level, levelLabel, summary, link, pubDate });
-  }
-
-  return items;
-}
-
-function extractTag(xml: string, tag: string): string | null {
-  const match = xml.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
-  return match ? (match[1] ?? match[2] ?? "").trim() : null;
-}
 
 export function getAdvisoryColor(level: number | null): string {
   switch (level) {

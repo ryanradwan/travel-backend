@@ -17,6 +17,7 @@ import {
   FileText,
   Globe,
   Package,
+  Puzzle,
 } from "lucide-react";
 
 const nav = [
@@ -30,6 +31,7 @@ const nav = [
   { href: "/dashboard/templates", label: "Templates", icon: BookOpen },
   { href: "/dashboard/connectors", label: "Connectors", icon: Plug },
   { href: "/dashboard/skills", label: "Custom Skills", icon: Wand2 },
+  { href: "/dashboard/plugins", label: "Custom Plugins", icon: Puzzle },
 ];
 
 const bottomNav = [

@@ -15,7 +15,7 @@ export default function TermsPage() {
         <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
           <section>
             <h2 className="text-lg font-bold text-navy">1. Acceptance of Terms</h2>
-            <p>By accessing or using TripDesk.ai ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service. TripDesk.ai is operated by TripDesk LLC ("we," "us," or "our").</p>
+            <p>By accessing or using TripDesk.ai (&ldquo;the Service&rdquo;), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service. TripDesk.ai is operated by TripDesk LLC (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;).</p>
           </section>
 
           <section>

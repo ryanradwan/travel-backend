@@ -38,7 +38,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-bold text-navy">3. AI and Your Data</h2>
-            <p>Your inputs to TripDesk.ai are sent to Anthropic's Claude API to generate responses. Anthropic's use of this data is governed by their privacy policy. We do not use your data to train AI models without your explicit consent.</p>
+            <p>Your inputs to TripDesk.ai are sent to Anthropic&apos;s Claude API to generate responses. Anthropic&apos;s use of this data is governed by their privacy policy. We do not use your data to train AI models without your explicit consent.</p>
           </section>
 
           <section>

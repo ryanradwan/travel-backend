@@ -9,7 +9,7 @@ export default async function TravelAdvisoryFeed() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-navy">Travel Advisories</h3>
-          <p className="text-xs text-gray-400 mt-0.5">US State Dept · Updated hourly</p>
+          <p className="text-xs text-gray-400 mt-0.5">US State Dept · Verify at travel.state.gov</p>
         </div>
         <a
           href="https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories.html"

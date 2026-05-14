@@ -1,9 +1,13 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { sendWelcomeEmail } from "@/lib/email/sequences";
 
-// Called internally after a new user's email is verified
-// Triggered by Supabase webhook or post-onboarding redirect
+// Internal-only endpoint — protected by service key header
 export async function POST(req: Request) {
+  const authHeader = req.headers.get("x-internal-key");
+  if (authHeader !== process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { userId } = await req.json();
   if (!userId) return Response.json({ error: "userId required" }, { status: 400 });
 

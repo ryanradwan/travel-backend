@@ -66,7 +66,10 @@ export async function saveBusinessProfile(formData: FormData) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   fetch(`${appUrl}/api/email/welcome`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-internal-key": process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+    },
     body: JSON.stringify({ userId: user.id }),
   }).catch(() => {});
 

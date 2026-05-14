@@ -17,7 +17,7 @@ export const PLANS = {
     annualPrice: 29000,
     tasksPerMonth: 30,
     seats: 1,
-    connectors: 6,
+    connectors: 8,
     customSkills: 3,
     customPlugins: 3,
     topUpRate: 500,

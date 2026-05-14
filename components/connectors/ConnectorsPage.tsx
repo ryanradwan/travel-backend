@@ -117,10 +117,10 @@ export default function ConnectorsPage({ connectors, tier, connectedParam, error
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-base font-semibold text-navy">Included on all plans</h2>
-            <p className="text-xs text-gray-400 mt-0.5">These 6 connectors are always available regardless of your plan.</p>
+            <p className="text-xs text-gray-400 mt-0.5">These 8 connectors are always available regardless of your plan.</p>
           </div>
           <span className="text-xs text-gray-400">
-            {STARTER_CONNECTORS.filter((id) => connectorMap[id]?.status === "connected").length} / 6 connected
+            {STARTER_CONNECTORS.filter((id) => connectorMap[id]?.status === "connected").length} / 8 connected
           </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

@@ -38,7 +38,7 @@ export interface ConnectorDefinition {
 }
 
 export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
-  // ── STARTER (6 fixed, always included) ──────────────────────────────────
+  // ── STARTER (8 fixed, always included) ──────────────────────────────────
   gmail: {
     id: "gmail", name: "Gmail", description: "Send and draft emails directly from TripDesk",
     category: "google", authType: "oauth2", oauthProvider: "google",

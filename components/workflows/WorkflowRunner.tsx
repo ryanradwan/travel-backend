@@ -14,12 +14,13 @@ interface StepState {
 
 interface WorkflowRunnerProps {
   workflowId: WorkflowId;
+  prefillInput?: string;
 }
 
-export default function WorkflowRunner({ workflowId }: WorkflowRunnerProps) {
+export default function WorkflowRunner({ workflowId, prefillInput }: WorkflowRunnerProps) {
   const workflow = WORKFLOWS[workflowId];
   const [phase, setPhase] = useState<"input" | "running" | "done">("input");
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(prefillInput ?? "");
   const [steps, setSteps] = useState<Record<number, StepState>>({});
   const [finalOutput, setFinalOutput] = useState("");
   const [taskId, setTaskId] = useState<string | undefined>(undefined);

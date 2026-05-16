@@ -10,6 +10,10 @@ import {
 import RecentTasks from "@/components/dashboard/RecentTasks";
 import ConnectorStatus from "@/components/dashboard/ConnectorStatus";
 import TravelAdvisoryFeed from "@/components/dashboard/TravelAdvisoryFeed";
+import CurrencyRates from "@/components/dashboard/travel/CurrencyRates";
+import TripCountdowns from "@/components/dashboard/travel/TripCountdowns";
+import PeakSeasonCalendar from "@/components/dashboard/travel/PeakSeasonCalendar";
+import DestinationSpotlight from "@/components/dashboard/travel/DestinationSpotlight";
 import { type Task, type TaskUsage, type Connector } from "@/types/database";
 
 export default async function DashboardPage() {
@@ -26,7 +30,7 @@ export default async function DashboardPage() {
       supabase.from("task_usage").select("*").eq("user_id", user.id).eq("month", month).single(),
       supabase.from("tasks").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
       supabase.from("connectors").select("*").eq("user_id", user.id),
-      supabase.from("bookings").select("id, client_name, destination, gross_value, commission_value, status").eq("user_id", user.id).not("status", "in", '("completed","cancelled")').order("created_at", { ascending: false }).limit(4),
+      supabase.from("bookings").select("id, client_name, destination, gross_value, commission_value, status, departure_date, travel_dates").eq("user_id", user.id).order("created_at", { ascending: false }).limit(20),
       supabase.from("proposals").select("id, status").eq("user_id", user.id).in("status", ["sent", "viewed"]),
     ]);
 
@@ -35,7 +39,8 @@ export default async function DashboardPage() {
   const usage = usageResult.data as TaskUsage | null;
   const tasks = (tasksResult.data ?? []) as Task[];
   const connectors = (connectorsResult.data ?? []) as Connector[];
-  const bookings = (bookingsResult.data ?? []) as { id: string; client_name: string; destination: string; gross_value: number; commission_value: number; status: string }[];
+  const allBookings = (bookingsResult.data ?? []) as { id: string; client_name: string; destination: string; gross_value: number; commission_value: number; status: string; departure_date: string | null; travel_dates: string | null }[];
+  const bookings = allBookings.filter(b => !["completed", "cancelled"].includes(b.status)).slice(0, 4);
   const pendingProposals = (proposalsResult.data ?? []).length;
 
   const tier = userData?.subscription_tier ?? "starter";
@@ -144,6 +149,14 @@ export default async function DashboardPage() {
         />
       </div>
 
+      {/* Currency rates strip */}
+      <Suspense fallback={<div className="card h-24 animate-pulse bg-gray-50" />}>
+        <CurrencyRates />
+      </Suspense>
+
+      {/* Trip countdowns — only shown when bookings exist with departure dates */}
+      <TripCountdowns bookings={allBookings} />
+
       {/* Quick Actions */}
       <div>
         <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Run a workflow</h2>
@@ -198,8 +211,10 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Right — advisories + connectors */}
+        {/* Right — destination spotlight, peak season, connectors, advisories */}
         <div className="space-y-6">
+          <DestinationSpotlight />
+          <PeakSeasonCalendar />
           <ConnectorStatus connectors={connectors} />
           <Suspense fallback={<AdvisoryFeedSkeleton />}>
             <TravelAdvisoryFeed />

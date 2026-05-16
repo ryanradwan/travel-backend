@@ -32,56 +32,57 @@ export default function PeakSeasonCalendar() {
       <div className="flex items-center gap-2 mb-4">
         <Sun size={15} className="text-orange-400" />
         <h3 className="text-sm font-semibold text-navy">Peak Season Guide</h3>
+        <span className="text-xs text-gray-400 ml-1">— what to be selling right now</span>
       </div>
 
-      <div className="space-y-4">
-        {/* This month */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Peak now */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-bold text-white bg-teal px-2 py-0.5 rounded-full">{monthName}</span>
-            <span className="text-xs text-gray-400">Peak now</span>
+            <span className="text-xs font-bold text-white bg-teal px-2.5 py-0.5 rounded-full">{monthName} — Peak</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {currentData.peak.map(d => (
               <span key={d} className="text-xs bg-teal/10 text-teal px-2 py-1 rounded-lg font-medium">{d}</span>
             ))}
           </div>
-          {currentData.shoulder.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
-              {currentData.shoulder.map(d => (
-                <span key={d} className="text-xs bg-yellow-50 text-yellow-700 px-2 py-1 rounded-lg">{d}</span>
-              ))}
+        </div>
+
+        {/* Shoulder */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-bold text-yellow-800 bg-yellow-100 px-2.5 py-0.5 rounded-full">Shoulder season</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {currentData.shoulder.length > 0
+              ? currentData.shoulder.map(d => (
+                  <span key={d} className="text-xs bg-yellow-50 text-yellow-700 px-2 py-1 rounded-lg">{d}</span>
+                ))
+              : <span className="text-xs text-gray-400">None this month</span>
+            }
+          </div>
+          {currentData.avoid.length > 0 && (
+            <div className="flex items-start gap-1.5 mt-3">
+              <Info size={11} className="text-gray-400 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-gray-400">
+                <span className="font-medium">Avoid: </span>{currentData.avoid.join(", ")}
+              </p>
             </div>
           )}
         </div>
 
-        <div className="border-t border-border" />
-
-        {/* Next month */}
+        {/* Coming up */}
         <div>
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp size={12} className="text-purple-500" />
-            <span className="text-xs font-semibold text-gray-600">Coming up in {nextMonthName}</span>
+            <span className="text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">Coming up — {nextMonthName}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {nextData.peak.slice(0, 4).map(d => (
+            {nextData.peak.slice(0, 5).map(d => (
               <span key={d} className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-lg">{d}</span>
             ))}
           </div>
         </div>
-
-        {currentData.avoid.length > 0 && (
-          <>
-            <div className="border-t border-border" />
-            <div className="flex items-start gap-2">
-              <Info size={12} className="text-gray-400 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-gray-400">
-                <span className="font-medium">Avoid advising this month: </span>
-                {currentData.avoid.join(", ")}
-              </p>
-            </div>
-          </>
-        )}
       </div>
     </div>
   );

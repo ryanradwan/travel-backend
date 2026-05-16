@@ -168,6 +168,9 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* Peak Season — full width horizontal strip */}
+      <PeakSeasonCalendar />
+
       {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -211,10 +214,9 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Right — destination spotlight, peak season, connectors, advisories */}
+        {/* Right — destination spotlight, connectors, advisories */}
         <div className="space-y-6">
           <DestinationSpotlight />
-          <PeakSeasonCalendar />
           <ConnectorStatus connectors={connectors} />
           <Suspense fallback={<AdvisoryFeedSkeleton />}>
             <TravelAdvisoryFeed />

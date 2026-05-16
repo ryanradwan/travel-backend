@@ -9,6 +9,17 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["playwright"],
   },
+  // Prevent browser caching HTML in development so CSS hash changes never cause stale loads
+  ...(process.env.NODE_ENV === "development" && {
+    headers: async () => [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "no-store, must-revalidate" },
+        ],
+      },
+    ],
+  }),
 };
 
 export default nextConfig;

@@ -149,10 +149,8 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Currency rates strip */}
-      <Suspense fallback={<div className="card h-24 animate-pulse bg-gray-50" />}>
-        <CurrencyRates />
-      </Suspense>
+      {/* App Connectors — full width strip */}
+      <ConnectorStatus connectors={connectors} />
 
       {/* Trip countdowns — only shown when bookings exist with departure dates */}
       <TripCountdowns bookings={allBookings} />
@@ -224,9 +222,11 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        {/* Right — connectors only */}
+        {/* Right — currency rates */}
         <div className="space-y-6">
-          <ConnectorStatus connectors={connectors} />
+          <Suspense fallback={<div className="card h-24 animate-pulse bg-gray-50" />}>
+            <CurrencyRates />
+          </Suspense>
         </div>
       </div>
 

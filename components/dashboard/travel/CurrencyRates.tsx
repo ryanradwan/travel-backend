@@ -40,7 +40,7 @@ export default async function CurrencyRates() {
       {!hasRates ? (
         <p className="text-xs text-gray-400 py-2">Rates temporarily unavailable</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {CURRENCIES.map(({ code, name, flag }) => {
             const rate = rates[code];
             if (!rate) return null;

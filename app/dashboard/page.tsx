@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import {
   FileText, Globe, Package, MessageSquare,
-  TrendingUp, CheckCircle2, Plug, Zap, ArrowRight,
+  CheckCircle2, Plug, Zap, ArrowRight,
   Clock, DollarSign, AlertTriangle
 } from "lucide-react";
 import RecentTasks from "@/components/dashboard/RecentTasks";
@@ -174,28 +174,18 @@ export default async function DashboardPage() {
       {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Left — recent tasks + pipeline */}
+        {/* Left — recent tasks + pipeline (only if deals exist) */}
         <div className="lg:col-span-2 space-y-6">
           <RecentTasks tasks={tasks} />
 
-          {/* Pipeline snapshot */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-navy">Open Pipeline</h3>
-              <Link href="/dashboard/pipeline" className="text-xs text-teal hover:underline flex items-center gap-1">
-                View all <ArrowRight size={11} />
-              </Link>
-            </div>
-
-            {bookings.length === 0 ? (
-              <div className="text-center py-6">
-                <TrendingUp size={24} className="text-gray-200 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">No open deals yet.</p>
-                <Link href="/dashboard/pipeline?add=1" className="text-xs text-teal hover:underline mt-1 inline-block">
-                  Add your first booking →
+          {bookings.length > 0 ? (
+            <div className="card">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-navy">Open Pipeline</h3>
+                <Link href="/dashboard/pipeline" className="text-xs text-teal hover:underline flex items-center gap-1">
+                  View all <ArrowRight size={11} />
                 </Link>
               </div>
-            ) : (
               <div className="space-y-2">
                 {bookings.map((b) => (
                   <Link key={b.id} href="/dashboard/pipeline" className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors group">
@@ -210,8 +200,25 @@ export default async function DashboardPage() {
                   </Link>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            /* No pipeline yet — show a compact tip strip instead of empty card */
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                { icon: "✈️", title: "Run a workflow", desc: "Build your first client itinerary or destination report.", href: "/dashboard/workflows/itinerary" },
+                { icon: "📋", title: "Track a booking", desc: "Add a deal to your pipeline to track value and commission.", href: "/dashboard/pipeline?add=1" },
+                { icon: "🔌", title: "Connect an app", desc: "Link Gmail or Google Drive so TripDesk can save and send.", href: "/dashboard/connectors" },
+              ].map(({ icon, title, desc, href }) => (
+                <Link key={href} href={href} className="card hover:border-teal hover:shadow-sm transition-all group flex items-start gap-3 py-4">
+                  <span className="text-xl leading-none flex-shrink-0">{icon}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-navy group-hover:text-teal transition-colors">{title}</p>
+                    <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{desc}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Right — destination spotlight + connectors only */}

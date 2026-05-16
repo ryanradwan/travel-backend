@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import RecentTasks from "@/components/dashboard/RecentTasks";
 import ConnectorStatus from "@/components/dashboard/ConnectorStatus";
-import TravelAdvisoryFeed from "@/components/dashboard/TravelAdvisoryFeed";
+import TravelAdvisoryFeedWide from "@/components/dashboard/TravelAdvisoryFeedWide";
 import CurrencyRates from "@/components/dashboard/travel/CurrencyRates";
 import TripCountdowns from "@/components/dashboard/travel/TripCountdowns";
 import PeakSeasonCalendar from "@/components/dashboard/travel/PeakSeasonCalendar";
@@ -214,15 +214,17 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Right — destination spotlight, connectors, advisories */}
+        {/* Right — destination spotlight + connectors only */}
         <div className="space-y-6">
           <DestinationSpotlight />
           <ConnectorStatus connectors={connectors} />
-          <Suspense fallback={<AdvisoryFeedSkeleton />}>
-            <TravelAdvisoryFeed />
-          </Suspense>
         </div>
       </div>
+
+      {/* Travel Advisories — full width below the grid */}
+      <Suspense fallback={<div className="card h-20 animate-pulse bg-gray-50" />}>
+        <TravelAdvisoryFeedWide />
+      </Suspense>
 
       {/* Onboarding checklist — show if connectors = 0 and tasks = 0 */}
       {connectedCount === 0 && used === 0 && (
@@ -285,20 +287,6 @@ function QuickAction({ href, icon, label, desc, color }: {
         <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{desc}</p>
       </div>
     </Link>
-  );
-}
-
-function AdvisoryFeedSkeleton() {
-  return (
-    <div className="card animate-pulse">
-      <div className="h-4 bg-gray-100 rounded w-1/3 mb-4" />
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex justify-between py-2">
-          <div className="h-3 bg-gray-100 rounded w-1/2" />
-          <div className="h-3 bg-gray-100 rounded w-8" />
-        </div>
-      ))}
-    </div>
   );
 }
 

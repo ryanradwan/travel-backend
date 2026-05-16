@@ -8,10 +8,18 @@ export interface BusinessProfile {
   years_in_business: number;
 }
 
+export interface AttachedFile {
+  name: string;
+  type: string;
+  data: string; // base64
+  size: number;
+}
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   isTask?: boolean;   // true = counted against quota, false = free question
+  files?: AttachedFile[];
 }
 
 export type WorkflowType = "itinerary" | "research" | "package" | "general";

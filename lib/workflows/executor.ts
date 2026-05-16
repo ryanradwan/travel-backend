@@ -5,8 +5,41 @@ import { getMemoryContext, extractAndSaveMemories } from "@/lib/agent/memory";
 import { buildComplianceBlock, detectDestination } from "@/lib/agent/compliance";
 import { createTask, completeTask, failTask, updateTaskStep } from "@/lib/agent/tasks";
 import { createClient } from "@/lib/supabase/server";
+import { searchFlights, formatFlightsForProposal } from "@/lib/amadeus/flights";
+import { isAmadeusConfigured } from "@/lib/amadeus/client";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+
+// Extract flight params from free-text input using a lightweight Claude call
+async function extractFlightParams(input: string): Promise<{
+  origin: string; destination: string; departureDate: string;
+  returnDate?: string; adults: number;
+} | null> {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const msg = await anthropic.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 150,
+      messages: [{
+        role: "user",
+        content: `Extract flight details from this travel request. Today is ${today}. Return ONLY valid JSON with: {"origin":"IATA code of departure airport","destination":"IATA code of arrival airport","departureDate":"YYYY-MM-DD","returnDate":"YYYY-MM-DD or null","adults":number}. If you cannot determine a field, use null. Use the nearest major airport.\n\nRequest: ${input}`,
+      }],
+    });
+    const raw = msg.content[0].type === "text" ? msg.content[0].text.trim() : "";
+    const jsonStr = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+    const parsed = JSON.parse(jsonStr);
+    if (!parsed.origin || !parsed.destination || !parsed.departureDate) return null;
+    return {
+      origin: parsed.origin,
+      destination: parsed.destination,
+      departureDate: parsed.departureDate,
+      returnDate: parsed.returnDate ?? undefined,
+      adults: parsed.adults ?? 2,
+    };
+  } catch {
+    return null;
+  }
+}
 
 export interface WorkflowProgressEvent {
   type: "step_start" | "step_complete" | "step_skip" | "output" | "done" | "error";
@@ -87,6 +120,7 @@ export async function executeWorkflow(
   const systemPrompt = buildSystemPrompt(profile, memoryContext, true);
   const stepOutputs: Record<number, string> = {};
   let fullOutput = "";
+  let liveFlightContext = ""; // populated before step 4 if Amadeus is configured
 
   try {
     for (const step of workflow.steps) {
@@ -102,6 +136,21 @@ export async function executeWorkflow(
         continue;
       }
 
+      // Before step 4 of the itinerary workflow, fetch live flight prices from Amadeus
+      if (workflowId === "itinerary" && step.number === 4 && isAmadeusConfigured()) {
+        try {
+          const params = await extractFlightParams(userInput);
+          if (params) {
+            const flights = await searchFlights({ ...params, max: 4 });
+            if (flights.length > 0) {
+              liveFlightContext = formatFlightsForProposal(flights, params.origin, params.destination);
+            }
+          }
+        } catch {
+          // Amadeus unavailable — step 4 falls back to AI estimates
+        }
+      }
+
       onProgress({ type: "step_start", step: step.number, stepName: step.name });
       await updateTaskStep(taskId, step.number, step.name, "running");
 
@@ -113,7 +162,12 @@ export async function executeWorkflow(
           .map(([n, out]) => `Step ${n}: ${out.slice(0, 500)}`)
           .join("\n\n");
 
-        const prompt = stepPromptFn(userInput, contextFromPreviousSteps);
+        // Inject live flight data for itinerary step 4
+        const extraContext = workflowId === "itinerary" && step.number === 4 && liveFlightContext
+          ? `\n\nLIVE FLIGHT DATA FROM AMADEUS GDS:\n${liveFlightContext}\n\nIMPORTANT: Use the above live prices in your pricing research output. Present these as real, bookable fares — not estimates.`
+          : "";
+
+        const prompt = stepPromptFn(userInput, contextFromPreviousSteps) + extraContext;
 
         const response = await anthropic.messages.create({
           model: "claude-sonnet-4-6",

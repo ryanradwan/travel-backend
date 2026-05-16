@@ -13,9 +13,11 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login");
 
-  const [profileResult, userResult] = await Promise.all([
+  const [profileResult, userResult, followUpsResult, inboxResult] = await Promise.all([
     supabase.from("business_profiles").select("business_name").eq("user_id", user.id).single(),
     supabase.from("users").select("subscription_tier").eq("id", user.id).single(),
+    supabase.from("email_drafts").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "pending"),
+    supabase.from("inquiries").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", ["new", "draft_ready"]),
   ]);
 
   const profile = profileResult.data as { business_name: string } | null;
@@ -24,6 +26,8 @@ export default async function DashboardLayout({
   if (!profile) redirect("/onboarding");
 
   const tier = userData?.subscription_tier ?? "starter";
+  const pendingFollowUps = followUpsResult.count ?? 0;
+  const pendingInquiries = inboxResult.count ?? 0;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -32,6 +36,8 @@ export default async function DashboardLayout({
           businessName={profile.business_name}
           userEmail={user.email}
           tier={tier}
+          pendingFollowUps={pendingFollowUps}
+          pendingInquiries={pendingInquiries}
         />
       </div>
 

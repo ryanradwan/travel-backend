@@ -24,6 +24,7 @@ interface BillingPageProps {
 
 const PLAN_FEATURES = {
   starter: [
+    "7-day free trial",
     "30 tasks/month",
     "1 seat",
     "8 connectors (Gmail, Drive, Calendar, Docs, WhatsApp, Canva, Skyscanner, Mailchimp)",
@@ -209,8 +210,8 @@ export default function BillingPage({
           />
           <PricingCard
             name="Professional"
-            monthlyPrice={6900}
-            annualPrice={69000}
+            monthlyPrice={5900}
+            annualPrice={59000}
             features={PLAN_FEATURES.professional}
             isCurrentPlan={currentTier === "professional"}
             isMostPopular
@@ -223,8 +224,8 @@ export default function BillingPage({
           />
           <PricingCard
             name="Agency"
-            monthlyPrice={10900}
-            annualPrice={109000}
+            monthlyPrice={8900}
+            annualPrice={89000}
             features={PLAN_FEATURES.agency}
             isCurrentPlan={currentTier === "agency"}
             billing={billing}

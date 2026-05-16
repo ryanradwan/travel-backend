@@ -1,6 +1,6 @@
 export type SubscriptionTier = "starter" | "professional" | "agency" | "enterprise";
 export type TaskStatus = "pending" | "running" | "completed" | "failed" | "rolled_back";
-export type ConnectorStatus = "connected" | "disconnected" | "unhealthy" | "expired";
+export type ConnectorStatus = "connected" | "disconnected" | "unhealthy" | "expired" | "needs_reconnect" | "error";
 export type ConnectorName =
   | "gmail"
   | "google_drive"

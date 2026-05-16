@@ -29,7 +29,7 @@ export default async function PipelinePage({ searchParams }: PageProps) {
 
   const list = (bookings ?? []) as {
     id: string; client_name: string; client_email: string | null;
-    destination: string; travel_dates: string | null;
+    destination: string; travel_dates: string | null; return_date: string | null;
     gross_value: number; commission_pct: number; commission_value: number;
     status: string; notes: string | null; created_at: string;
   }[];
@@ -103,6 +103,10 @@ export default async function PipelinePage({ searchParams }: PageProps) {
             <div>
               <label className="label">Travel dates</label>
               <input name="travel_dates" defaultValue={editBooking?.travel_dates ?? ""} className="input mt-1" placeholder="Oct 12–22, 2026" />
+            </div>
+            <div>
+              <label className="label">Return date <span className="text-gray-400 font-normal">(for post-trip follow-up)</span></label>
+              <input name="return_date" type="date" defaultValue={editBooking?.return_date ?? ""} className="input mt-1" />
             </div>
             <div>
               <label className="label">Trip value (USD)</label>

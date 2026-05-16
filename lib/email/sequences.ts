@@ -141,11 +141,11 @@ export async function sendTrialEndingEmail({ to, firstName }: WelcomeEmailData) 
         <td style="padding:8px 0; color:#6B7280; font-size:14px; text-align:right;">30 tasks/month</td>
       </tr>
       <tr>
-        <td style="padding:8px 0; color:#374151; font-size:14px;"><strong>Professional</strong> — $69/mo</td>
+        <td style="padding:8px 0; color:#374151; font-size:14px;"><strong>Professional</strong> — $59/mo</td>
         <td style="padding:8px 0; color:#6B7280; font-size:14px; text-align:right;">100 tasks/month</td>
       </tr>
       <tr>
-        <td style="padding:8px 0; color:#374151; font-size:14px;"><strong>Agency</strong> — $109/mo</td>
+        <td style="padding:8px 0; color:#374151; font-size:14px;"><strong>Agency</strong> — $89/mo</td>
         <td style="padding:8px 0; color:#6B7280; font-size:14px; text-align:right;">Unlimited</td>
       </tr>
     </table>

@@ -6,42 +6,67 @@ import { requiresComplianceCheck, detectDestination, buildComplianceBlock } from
 import { checkTaskQuota, createTask, completeTask, failTask } from "@/lib/agent/tasks";
 import { classifyIntent } from "@/lib/agent/intent";
 import { type ChatMessage } from "@/lib/agent/types";
+import { needsWebSearch, searchWeb, buildSearchContext } from "@/lib/tools/web-search";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+
+interface AttachedFile {
+  name: string;
+  type: string;
+  data: string; // base64
+}
+
+// Build a Claude content block from an attached file
+function buildFileBlock(file: AttachedFile): Anthropic.ContentBlockParam {
+  if (file.type.startsWith("image/")) {
+    const mediaType = file.type as "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+    return {
+      type: "image",
+      source: { type: "base64", media_type: mediaType, data: file.data },
+    };
+  }
+
+  if (file.type === "application/pdf") {
+    return {
+      type: "document",
+      source: { type: "base64", media_type: "application/pdf", data: file.data },
+    } as Anthropic.ContentBlockParam;
+  }
+
+  // Plain text / CSV — decode and include as text
+  try {
+    const decoded = Buffer.from(file.data, "base64").toString("utf-8");
+    return { type: "text", text: `[Attached file: ${file.name}]\n\n${decoded}` };
+  } catch {
+    return { type: "text", text: `[Attached file: ${file.name} — could not read content]` };
+  }
+}
 
 export async function POST(req: Request) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!user) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  let body: { messages: ChatMessage[]; workflow?: string };
+  let body: { messages: ChatMessage[]; workflow?: string; files?: AttachedFile[] };
   try {
     body = await req.json();
   } catch {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { messages, workflow = "general" } = body;
+  const { messages, workflow = "general", files = [] } = body;
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return Response.json({ error: "Messages are required" }, { status: 400 });
   }
 
   const userInput = messages[messages.length - 1].content;
-
-  // Classify intent — questions are free, tasks count against the monthly limit
   const intent = classifyIntent(userInput);
-  const isBillableTask = intent === "task" || (workflow !== "general");
+  const isBillableTask = intent === "task" || workflow !== "general";
 
-  // Only check quota for billable tasks
   if (isBillableTask) {
     const quota = await checkTaskQuota(user.id);
     if (!quota.allowed) {
@@ -52,36 +77,48 @@ export async function POST(req: Request) {
     }
   }
 
-  // Load business profile and memory context
   const [profileResult, memoryContext] = await Promise.all([
     supabase.from("business_profiles").select("*").eq("user_id", user.id).single(),
     getMemoryContext(user.id),
   ]);
 
   const profile = profileResult.data as {
-    business_name: string;
-    business_type: string;
-    location: string;
-    specialty_destinations: string[];
-    target_clients: string | null;
-    team_size: number;
-    years_in_business: number;
+    business_name: string; business_type: string; location: string;
+    specialty_destinations: string[]; target_clients: string | null;
+    team_size: number; years_in_business: number;
   } | null;
 
   const needsCompliance = requiresComplianceCheck(userInput);
   const destination = needsCompliance ? detectDestination(userInput) : null;
 
-  // Only create a task record for billable tasks
   let taskId: string | null = null;
   if (isBillableTask) {
     taskId = await createTask(user.id, userInput, workflow);
-    if (!taskId) {
-      return Response.json({ error: "Failed to start task. Please try again." }, { status: 500 });
-    }
+    if (!taskId) return Response.json({ error: "Failed to start task. Please try again." }, { status: 500 });
   }
 
-  const systemPrompt = buildSystemPrompt(profile, memoryContext, needsCompliance);
+  const baseSystemPrompt = buildSystemPrompt(profile, memoryContext, needsCompliance);
   const encoder = new TextEncoder();
+
+  // Run web search before streaming if the query needs live data
+  const shouldSearch = needsWebSearch(userInput);
+  let systemPrompt = baseSystemPrompt;
+
+  // Build Claude messages — attach files as content blocks on the final user message
+  const claudeMessages: Anthropic.MessageParam[] = messages.map((m, idx) => {
+    const isLastUser = m.role === "user" && idx === messages.length - 1;
+
+    if (isLastUser && files.length > 0) {
+      const fileBlocks = files.map(buildFileBlock);
+      const content: Anthropic.ContentBlockParam[] = [
+        ...fileBlocks,
+        ...(m.content ? [{ type: "text" as const, text: m.content }] : []),
+      ];
+      return { role: "user", content };
+    }
+
+    return { role: m.role as "user" | "assistant", content: m.content };
+  });
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -90,10 +127,14 @@ export async function POST(req: Request) {
       let outputTokens = 0;
 
       try {
-        const claudeMessages = messages.map((m) => ({
-          role: m.role as "user" | "assistant",
-          content: m.content,
-        }));
+        // Run web search and inject results before Claude responds
+        if (shouldSearch) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "searching", query: userInput })}\n\n`));
+          const searchResults = await searchWeb(userInput);
+          if (searchResults) {
+            systemPrompt = baseSystemPrompt + buildSearchContext(userInput, searchResults);
+          }
+        }
 
         const claudeStream = anthropic.messages.stream({
           model: "claude-sonnet-4-6",
@@ -116,7 +157,6 @@ export async function POST(req: Request) {
           }
         }
 
-        // Append compliance block on travel-related outputs
         if (needsCompliance && destination) {
           const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
           const complianceText = buildComplianceBlock(destination, null, false, today).fullBlock;
@@ -127,22 +167,16 @@ export async function POST(req: Request) {
         const totalTokens = inputTokens + outputTokens;
 
         if (isBillableTask && taskId) {
-          // Complete task and deduct 1 from monthly usage
           await completeTask(taskId, user.id, fullResponse, totalTokens);
           extractAndSaveMemories(user.id, taskId, userInput, fullResponse).catch(() => {});
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", taskId, isTask: true, tokensUsed: totalTokens })}\n\n`));
         } else {
-          // Question — no usage charged, no task record
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", isTask: false })}\n\n`));
         }
 
       } catch (error) {
         const errMsg = error instanceof Error ? error.message : "Unknown error";
-
-        if (isBillableTask && taskId) {
-          await failTask(taskId, errMsg);
-        }
-
+        if (isBillableTask && taskId) await failTask(taskId, errMsg);
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", error: getFriendlyError(errMsg) })}\n\n`));
       } finally {
         controller.close();
@@ -160,17 +194,9 @@ export async function POST(req: Request) {
 }
 
 function getFriendlyError(error: string): string {
-  if (error.includes("rate_limit") || error.includes("429")) {
-    return "TripDesk is busy right now — please try again in a moment.";
-  }
-  if (error.includes("timeout") || error.includes("ETIMEDOUT")) {
-    return "The request took too long. Please try again with a shorter message.";
-  }
-  if (error.includes("context_length") || error.includes("too long")) {
-    return "Your conversation is very long. Start a new chat to continue.";
-  }
-  if (error.includes("API key") || error.includes("authentication")) {
-    return "There's a configuration issue. Please contact support.";
-  }
+  if (error.includes("rate_limit") || error.includes("429")) return "TripDesk is busy right now — please try again in a moment.";
+  if (error.includes("timeout") || error.includes("ETIMEDOUT")) return "The request took too long. Please try again with a shorter message.";
+  if (error.includes("context_length") || error.includes("too long")) return "Your conversation is very long. Start a new chat to continue.";
+  if (error.includes("API key") || error.includes("authentication")) return "There's a configuration issue. Please contact support.";
   return "Something went wrong. Your task usage was not charged. Please try again.";
 }

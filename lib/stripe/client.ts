@@ -25,8 +25,8 @@ export const PLANS = {
   },
   professional: {
     name: "Professional",
-    monthlyPrice: 6900,
-    annualPrice: 69000,
+    monthlyPrice: 5900,
+    annualPrice: 59000,
     tasksPerMonth: 100,
     seats: 5,
     connectors: 20,
@@ -37,8 +37,8 @@ export const PLANS = {
   },
   agency: {
     name: "Agency",
-    monthlyPrice: 10900,
-    annualPrice: 109000,
+    monthlyPrice: 8900,
+    annualPrice: 89000,
     tasksPerMonth: Infinity,
     seats: Infinity,
     connectors: Infinity,

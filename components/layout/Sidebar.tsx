@@ -19,6 +19,12 @@ import {
   Package,
   Puzzle,
   TrendingUp,
+  Mail,
+  BarChart2,
+  PieChart,
+  Inbox,
+  Sparkles,
+  Plane,
 } from "lucide-react";
 
 const nav = [
@@ -28,6 +34,12 @@ const nav = [
   { href: "/dashboard/workflows/research", label: "Destination Report", icon: Globe },
   { href: "/dashboard/workflows/package", label: "Tour Package", icon: Package },
   { href: "/dashboard/pipeline", label: "Pipeline", icon: TrendingUp },
+  { href: "/dashboard/revenue", label: "Revenue", icon: BarChart2 },
+  { href: "/dashboard/analytics", label: "Analytics", icon: PieChart },
+  { href: "/dashboard/trends", label: "Trends", icon: Sparkles },
+  { href: "/dashboard/flights", label: "Flight Search", icon: Plane },
+  { href: "/dashboard/inbox", label: "Inbox", icon: Inbox, badgeKey: "inbox" },
+  { href: "/dashboard/follow-ups", label: "Follow-Ups", icon: Mail, badgeKey: "followUps" },
   { href: "/dashboard/clients", label: "Clients", icon: Users },
   { href: "/dashboard/tasks", label: "Task History", icon: Clock },
   { href: "/dashboard/templates", label: "Templates", icon: BookOpen },
@@ -44,10 +56,17 @@ interface SidebarProps {
   businessName?: string;
   userEmail?: string;
   tier?: string;
+  pendingFollowUps?: number;
+  pendingInquiries?: number;
 }
 
-export default function Sidebar({ businessName, userEmail, tier = "Starter" }: SidebarProps) {
+export default function Sidebar({ businessName, userEmail, tier = "Starter", pendingFollowUps = 0, pendingInquiries = 0 }: SidebarProps) {
   const pathname = usePathname();
+
+  const badges: Record<string, number> = {
+    followUps: pendingFollowUps,
+    inbox: pendingInquiries,
+  };
 
   return (
     <aside className="w-64 bg-navy flex flex-col min-h-screen">
@@ -63,8 +82,9 @@ export default function Sidebar({ businessName, userEmail, tier = "Starter" }: S
 
       {/* Main nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {nav.map(({ href, label, icon: Icon }) => {
+        {nav.map(({ href, label, icon: Icon, badgeKey }) => {
           const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+          const badgeCount = badgeKey ? badges[badgeKey] : 0;
           return (
             <Link
               key={href}
@@ -77,7 +97,12 @@ export default function Sidebar({ businessName, userEmail, tier = "Starter" }: S
               )}
             >
               <Icon size={18} />
-              {label}
+              <span className="flex-1">{label}</span>
+              {badgeCount > 0 && (
+                <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                  {badgeCount}
+                </span>
+              )}
             </Link>
           );
         })}

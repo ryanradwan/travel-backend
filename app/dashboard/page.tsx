@@ -168,6 +168,9 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* Destination spotlight — full width horizontal */}
+      <DestinationSpotlight />
+
       {/* Peak Season — full width horizontal strip */}
       <PeakSeasonCalendar />
 
@@ -221,9 +224,8 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        {/* Right — destination spotlight + connectors only */}
+        {/* Right — connectors only */}
         <div className="space-y-6">
-          <DestinationSpotlight />
           <ConnectorStatus connectors={connectors} />
         </div>
       </div>

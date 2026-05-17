@@ -101,7 +101,7 @@ export default function Sidebar({
       {/* Logo */}
       <div className="px-5 py-4 border-b border-white/10">
         <Link href="/dashboard" className="text-white text-lg font-bold tracking-tight">
-          TravelBackend<span className="text-teal">.com</span>
+          TravelBackend
         </Link>
         {businessName && (
           <p className="text-blue-300 text-xs mt-0.5 truncate">{businessName}</p>

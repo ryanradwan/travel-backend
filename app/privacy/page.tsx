@@ -7,7 +7,7 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <Link href="/" className="text-navy font-bold text-xl">TravelBackend<span className="text-teal">.com</span></Link>
+        <Link href="/" className="text-navy font-bold text-xl">TravelBackend</Link>
 
         <h1 className="text-3xl font-bold text-navy mt-8 mb-2">Privacy Policy</h1>
         <p className="text-gray-500 text-sm mb-8">Last updated: May 2026</p>

@@ -13,7 +13,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
       <div className="hidden lg:flex lg:w-1/2 bg-navy flex-col justify-between p-12">
         <div>
           <Link href="/" className="text-white text-2xl font-bold tracking-tight">
-            TravelBackend<span className="text-teal">.com</span>
+            TravelBackend
           </Link>
           <p className="mt-2 text-blue-200 text-sm">AI-powered operations for travel businesses</p>
         </div>
@@ -39,7 +39,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
         <div className="w-full max-w-md mx-auto">
           <div className="mb-2 lg:hidden">
             <Link href="/" className="text-navy text-xl font-bold">
-              TravelBackend<span className="text-teal">.com</span>
+              TravelBackend
             </Link>
           </div>
           <h1 className="text-2xl font-bold text-navy mb-1">{title}</h1>

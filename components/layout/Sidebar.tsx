@@ -97,7 +97,7 @@ export default function Sidebar({
   }
 
   return (
-    <aside className="w-56 bg-navy flex flex-col min-h-screen">
+    <aside className="w-56 bg-navy flex flex-col h-full min-h-screen sticky top-0">
       {/* Logo */}
       <div className="px-5 py-4 border-b border-white/10">
         <Link href="/dashboard" className="text-white text-lg font-bold tracking-tight">

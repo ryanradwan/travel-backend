@@ -31,7 +31,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-background">
-      <div className="hidden lg:block">
+      <div className="hidden lg:block self-stretch">
         <Sidebar
           businessName={profile.business_name}
           userEmail={user.email}

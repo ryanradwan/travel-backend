@@ -2,19 +2,19 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
-export const metadata: Metadata = { title: "Help & FAQ — TripDesk.ai" };
+export const metadata: Metadata = { title: "Help & FAQ — TravelBackend.com" };
 
 const FAQ = [
   {
     category: "Getting Started",
     questions: [
       {
-        q: "What is TripDesk.ai?",
-        a: "TripDesk.ai is an AI-powered business operations platform built exclusively for US travel businesses. It helps travel agencies, independent advisors, and tour operators execute everyday tasks — from building client itineraries to publishing tour packages — through a conversational AI agent.",
+        q: "What is TravelBackend.com?",
+        a: "TravelBackend.com is an AI-powered business operations platform built exclusively for US travel businesses. It helps travel agencies, independent advisors, and tour operators execute everyday tasks — from building client itineraries to publishing tour packages — through a conversational AI agent.",
       },
       {
         q: "How do I run my first task?",
-        a: "Go to the Dashboard and click any Quick Action — 'Client Itinerary', 'Destination Report', or 'Tour Package'. Fill in the details and TripDesk will work through each step, showing you progress in real time. You can also use 'Ask TripDesk' for free-form questions.",
+        a: "Go to the Dashboard and click any Quick Action — 'Client Itinerary', 'Destination Report', or 'Tour Package'. Fill in the details and TravelBackend will work through each step, showing you progress in real time. You can also use 'Ask TravelBackend' for free-form questions.",
       },
       {
         q: "What's the difference between a question and a task?",
@@ -48,7 +48,7 @@ const FAQ = [
     questions: [
       {
         q: "How do connectors work?",
-        a: "Connectors link TripDesk to the apps you already use. Once connected, TripDesk can take actions in those apps automatically — saving documents to Google Drive, drafting emails in Gmail, publishing pages to WordPress, and more.",
+        a: "Connectors link TravelBackend to the apps you already use. Once connected, TravelBackend can take actions in those apps automatically — saving documents to Google Drive, drafting emails in Gmail, publishing pages to WordPress, and more.",
       },
       {
         q: "How many connectors do I get?",
@@ -60,7 +60,7 @@ const FAQ = [
       },
       {
         q: "Is my data safe when I connect an app?",
-        a: "Yes. We use OAuth — TripDesk never sees or stores your login passwords. Access tokens are encrypted before storage. You can disconnect any connector at any time and TripDesk will immediately lose access to that app.",
+        a: "Yes. We use OAuth — TravelBackend never sees or stores your login passwords. Access tokens are encrypted before storage. You can disconnect any connector at any time and TravelBackend will immediately lose access to that app.",
       },
     ],
   },
@@ -90,15 +90,15 @@ const FAQ = [
     questions: [
       {
         q: "How accurate is the AI?",
-        a: "TripDesk is highly capable for travel industry tasks, but AI can make mistakes. All dynamic information — visa requirements, travel advisories, prices, availability — must be verified before sharing with clients. We include a compliance disclaimer on every travel-related output.",
+        a: "TravelBackend is highly capable for travel industry tasks, but AI can make mistakes. All dynamic information — visa requirements, travel advisories, prices, availability — must be verified before sharing with clients. We include a compliance disclaimer on every travel-related output.",
       },
       {
-        q: "Does TripDesk learn from my business over time?",
-        a: "Yes. TripDesk builds an AI memory of your business — your preferred destinations, client types, workflow patterns, and past outputs. This memory is injected into every task so the AI gets smarter and more personalised the more you use it.",
+        q: "Does TravelBackend learn from my business over time?",
+        a: "Yes. TravelBackend builds an AI memory of your business — your preferred destinations, client types, workflow patterns, and past outputs. This memory is injected into every task so the AI gets smarter and more personalised the more you use it.",
       },
       {
-        q: "Will TripDesk book trips or process payments?",
-        a: "No. TripDesk researches, writes, and organises — it does not make actual bookings or process financial transactions on your behalf. All bookings and payments remain under your control.",
+        q: "Will TravelBackend book trips or process payments?",
+        a: "No. TravelBackend researches, writes, and organises — it does not make actual bookings or process financial transactions on your behalf. All bookings and payments remain under your control.",
       },
     ],
   },
@@ -109,15 +109,15 @@ export default function HelpPage() {
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <Link href="/dashboard" className="text-navy font-bold text-xl">
-          TripDesk<span className="text-teal">.ai</span>
+          TravelBackend<span className="text-teal">.ai</span>
         </Link>
 
         <div className="mt-8 mb-10 text-center">
           <h1 className="text-3xl font-bold text-navy">Help & FAQ</h1>
-          <p className="text-gray-500 mt-2">Everything you need to get the most out of TripDesk.ai</p>
+          <p className="text-gray-500 mt-2">Everything you need to get the most out of TravelBackend.com</p>
           <p className="text-sm text-gray-400 mt-2">
             Can&apos;t find your answer?{" "}
-            <a href="mailto:support@tripdesk.ai" className="text-teal hover:underline">
+            <a href="mailto:support@travelbackend.com" className="text-teal hover:underline">
               Email support →
             </a>
           </p>
@@ -151,7 +151,7 @@ export default function HelpPage() {
           <p className="text-sm font-semibold text-navy mb-1">Still need help?</p>
           <p className="text-sm text-gray-500 mb-3">Our team responds within 48 hours on Starter, 24 hours on Professional, and same day on Agency.</p>
           <a
-            href="mailto:support@tripdesk.ai"
+            href="mailto:support@travelbackend.com"
             className="btn-teal text-sm px-4 py-2 rounded inline-block"
           >
             Email support

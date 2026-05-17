@@ -112,7 +112,7 @@ export function wrapInEmailHtml(body: string, subject: string, businessName: str
   </div>
   <div style="background:#F4F7FA;padding:16px 32px;border-top:1px solid #E5E7EB;">
     <p style="color:#9CA3AF;font-size:12px;margin:0;">
-      Sent via <a href="https://tripdesk.ai" style="color:#0E7C7B;text-decoration:none;">TripDesk.ai</a>
+      Sent via <a href="https://travelbackend.com" style="color:#0E7C7B;text-decoration:none;">TravelBackend.com</a>
     </p>
   </div>
 </div>

@@ -194,7 +194,7 @@ export async function POST(req: Request) {
 }
 
 function getFriendlyError(error: string): string {
-  if (error.includes("rate_limit") || error.includes("429")) return "TripDesk is busy right now — please try again in a moment.";
+  if (error.includes("rate_limit") || error.includes("429")) return "TravelBackend is busy right now — please try again in a moment.";
   if (error.includes("timeout") || error.includes("ETIMEDOUT")) return "The request took too long. Please try again with a shorter message.";
   if (error.includes("context_length") || error.includes("too long")) return "Your conversation is very long. Start a new chat to continue.";
   if (error.includes("API key") || error.includes("authentication")) return "There's a configuration issue. Please contact support.";

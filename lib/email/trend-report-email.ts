@@ -53,7 +53,7 @@ export function buildTrendReportEmail(
 <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;">
 
   <div style="background:#0B2D56;padding:32px;text-align:center;">
-    <h1 style="color:white;margin:0;font-size:22px;font-weight:700;">TripDesk<span style="color:#0E7C7B">.ai</span></h1>
+    <h1 style="color:white;margin:0;font-size:22px;font-weight:700;">TravelBackend<span style="color:#0E7C7B">.ai</span></h1>
     <p style="color:#93C5FD;margin:6px 0 0;font-size:13px;">Weekly Destination Trend Report</p>
   </div>
 
@@ -69,14 +69,14 @@ export function buildTrendReportEmail(
     <div style="text-align:center;margin:28px 0 16px;">
       <a href="${appUrl}/dashboard/trends"
          style="background:#0E7C7B;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;display:inline-block;">
-        View full report in TripDesk →
+        View full report in TravelBackend →
       </a>
     </div>
   </div>
 
   <div style="background:#F4F7FA;padding:16px 32px;border-top:1px solid #E5E7EB;text-align:center;">
     <p style="color:#9CA3AF;font-size:12px;margin:0;">
-      Sent every Monday by <a href="https://tripdesk.ai" style="color:#0E7C7B;text-decoration:none;">TripDesk.ai</a>
+      Sent every Monday by <a href="https://travelbackend.com" style="color:#0E7C7B;text-decoration:none;">TravelBackend.com</a>
     </p>
   </div>
 </div>

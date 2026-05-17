@@ -37,7 +37,7 @@ export default async function PluginsPage({ searchParams }: PageProps) {
         <div>
           <h1 className="text-2xl font-bold text-navy">Custom Plugins</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Connect any external API so TripDesk can call it during tasks.
+            Connect any external API so TravelBackend can call it during tasks.
             {!isUnlimited && <span className="ml-1 text-gray-400">{plugins.length} of {limit} used.</span>}
           </p>
         </div>
@@ -62,7 +62,7 @@ export default async function PluginsPage({ searchParams }: PageProps) {
       <div className="card bg-blue-50 border-blue-200">
         <h3 className="text-sm font-semibold text-navy mb-1">What are custom plugins?</h3>
         <p className="text-sm text-gray-600">
-          Plugins connect TripDesk to any API your business uses — your own booking system, a private hotel rate feed, a custom CRM, or any tool with an API. TripDesk can call the API during tasks and use the response in its output.
+          Plugins connect TravelBackend to any API your business uses — your own booking system, a private hotel rate feed, a custom CRM, or any tool with an API. TravelBackend can call the API during tasks and use the response in its output.
         </p>
       </div>
 

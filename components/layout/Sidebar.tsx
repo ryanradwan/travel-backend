@@ -27,7 +27,7 @@ const groups: NavGroup[] = [
     label: "",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/dashboard/chat", label: "Ask TripDesk", icon: MessageSquare },
+      { href: "/dashboard/chat", label: "Ask TravelBackend", icon: MessageSquare },
     ],
   },
   {
@@ -101,7 +101,7 @@ export default function Sidebar({
       {/* Logo */}
       <div className="px-5 py-4 border-b border-white/10">
         <Link href="/dashboard" className="text-white text-lg font-bold tracking-tight">
-          TripDesk<span className="text-teal">.ai</span>
+          TravelBackend<span className="text-teal">.com</span>
         </Link>
         {businessName && (
           <p className="text-blue-300 text-xs mt-0.5 truncate">{businessName}</p>

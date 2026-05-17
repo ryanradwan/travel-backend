@@ -4,7 +4,7 @@ import { Sparkles, RefreshCw, TrendingUp, Clock } from "lucide-react";
 import { generateTrendReport } from "./actions";
 import { type TrendDestination } from "@/lib/email/trend-report-email";
 
-export const metadata = { title: "Destination Trends — TripDesk.ai" };
+export const metadata = { title: "Destination Trends — TravelBackend.com" };
 
 interface TrendReport {
   id: string;

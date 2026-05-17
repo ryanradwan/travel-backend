@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   }
 
   const supabase = createServiceClient();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tripdesk.ai";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://travelbackend.com";
 
   // Monday of the current week
   const now = new Date();
@@ -72,7 +72,7 @@ export async function GET(req: Request) {
       try {
         const resend = getResend();
         await resend.emails.send({
-          from: `TripDesk.ai <${FROM_EMAIL}>`,
+          from: `TravelBackend.com <${FROM_EMAIL}>`,
           to: userEmail,
           subject: `Your weekly destination trends — ${new Date(weekOf).toLocaleDateString("en-US", { month: "long", day: "numeric" })}`,
           html: buildTrendReportEmail(trends, profile.business_name, weekOf, appUrl),

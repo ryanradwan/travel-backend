@@ -43,7 +43,7 @@ export async function POST(req: Request, { params }: { params: { token: string }
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "TripDesk <notifications@tripdesk.ai>",
+          from: "TravelBackend <notifications@travelbackend.com>",
           to: notifyEmail,
           subject: `✅ ${proposal.client_name} approved your proposal`,
           html: `<p><strong>${proposal.client_name}</strong> has approved your proposal: <strong>${proposal.title}</strong>.</p>${message ? `<p>Their message: <em>${message}</em></p>` : ""}<p><a href="${appUrl}/dashboard/pipeline">View in your pipeline →</a></p>`,

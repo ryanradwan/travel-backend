@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Mail, CheckCircle2 } from "lucide-react";
 import DraftCard from "@/components/follow-ups/DraftCard";
 
-export const metadata = { title: "Follow-Ups — TripDesk.ai" };
+export const metadata = { title: "Follow-Ups — TravelBackend.com" };
 
 interface Draft {
   id: string;
@@ -105,7 +105,7 @@ export default async function FollowUpsPage({
               <CheckCircle2 size={36} className="text-teal mx-auto mb-3" />
               <p className="text-navy font-semibold">All caught up</p>
               <p className="text-gray-400 text-sm mt-2 max-w-sm mx-auto">
-                No follow-up emails waiting for approval. TripDesk will automatically draft new ones when proposals are sent or clients return from trips.
+                No follow-up emails waiting for approval. TravelBackend will automatically draft new ones when proposals are sent or clients return from trips.
               </p>
             </>
           ) : (
@@ -178,7 +178,7 @@ export default async function FollowUpsPage({
       <div className="bg-navy/5 border border-navy/10 rounded-xl p-5">
         <p className="text-sm font-semibold text-navy mb-2">How automated follow-ups work</p>
         <ul className="text-sm text-gray-500 space-y-1.5">
-          <li>· When you add a booking with status <strong>Proposal Sent</strong>, TripDesk starts a follow-up sequence.</li>
+          <li>· When you add a booking with status <strong>Proposal Sent</strong>, TravelBackend starts a follow-up sequence.</li>
           <li>· Draft emails appear here at <strong>Day 3</strong>, <strong>Day 7</strong>, and <strong>Day 14</strong> if the client has not responded.</li>
           <li>· Set a <strong>return date</strong> on a booking to automatically receive a post-trip check-in and review request the next day.</li>
           <li>· Every email is a draft — you review and approve before anything is sent.</li>

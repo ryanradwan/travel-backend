@@ -3,8 +3,8 @@ import AuthLayout from "@/components/auth/AuthLayout";
 import SignupForm from "@/components/auth/SignupForm";
 
 export const metadata: Metadata = {
-  title: "Start Free Trial — TripDesk.ai",
-  description: "Try TripDesk.ai free for 7 days. AI-powered operations for travel businesses.",
+  title: "Start Free Trial — TravelBackend.com",
+  description: "Try TravelBackend.com free for 7 days. AI-powered operations for travel businesses.",
 };
 
 interface SignupPageProps {

@@ -87,7 +87,7 @@ export default function ConnectorsPage({ connectors, tier, connectedParam, error
       <div>
         <h1 className="text-2xl font-bold text-navy">Connectors</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Connect your apps so TripDesk can take action on your behalf.
+          Connect your apps so TravelBackend can take action on your behalf.
         </p>
       </div>
 

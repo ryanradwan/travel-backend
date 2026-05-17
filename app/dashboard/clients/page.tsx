@@ -45,7 +45,7 @@ export default async function ClientsPage() {
           <Users size={32} className="text-gray-200 mx-auto mb-3" />
           <p className="text-gray-500 text-sm font-medium">No clients yet</p>
           <p className="text-gray-400 text-xs mt-1 mb-4">
-            Add clients so TripDesk can personalise proposals with their preferences.
+            Add clients so TravelBackend can personalise proposals with their preferences.
           </p>
           <Link href="/dashboard/clients/new" className="btn-teal text-sm px-4 py-2 rounded inline-block">
             Add your first client

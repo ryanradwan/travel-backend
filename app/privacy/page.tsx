@@ -1,13 +1,13 @@
 import { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Privacy Policy — TripDesk.ai" };
+export const metadata: Metadata = { title: "Privacy Policy — TravelBackend.com" };
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <Link href="/" className="text-navy font-bold text-xl">TripDesk<span className="text-teal">.ai</span></Link>
+        <Link href="/" className="text-navy font-bold text-xl">TravelBackend<span className="text-teal">.com</span></Link>
 
         <h1 className="text-3xl font-bold text-navy mt-8 mb-2">Privacy Policy</h1>
         <p className="text-gray-500 text-sm mb-8">Last updated: May 2026</p>
@@ -38,7 +38,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-bold text-navy">3. AI and Your Data</h2>
-            <p>Your inputs to TripDesk.ai are sent to Anthropic&apos;s Claude API to generate responses. Anthropic&apos;s use of this data is governed by their privacy policy. We do not use your data to train AI models without your explicit consent.</p>
+            <p>Your inputs to TravelBackend.com are sent to Anthropic&apos;s Claude API to generate responses. Anthropic&apos;s use of this data is governed by their privacy policy. We do not use your data to train AI models without your explicit consent.</p>
           </section>
 
           <section>
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-bold text-navy">7. Your Rights</h2>
-            <p>You have the right to access, correct, export, or delete your data at any time. Contact us at <a href="mailto:privacy@tripdesk.ai" className="text-teal hover:underline">privacy@tripdesk.ai</a> to exercise these rights.</p>
+            <p>You have the right to access, correct, export, or delete your data at any time. Contact us at <a href="mailto:privacy@travelbackend.com" className="text-teal hover:underline">privacy@travelbackend.com</a> to exercise these rights.</p>
           </section>
 
           <section>
@@ -76,7 +76,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-lg font-bold text-navy">9. Contact</h2>
-            <p>Privacy questions: <a href="mailto:privacy@tripdesk.ai" className="text-teal hover:underline">privacy@tripdesk.ai</a></p>
+            <p>Privacy questions: <a href="mailto:privacy@travelbackend.com" className="text-teal hover:underline">privacy@travelbackend.com</a></p>
           </section>
         </div>
       </div>

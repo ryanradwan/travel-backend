@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { DollarSign, TrendingUp, CheckCircle2, Percent, Download } from "lucide-react";
 
-export const metadata = { title: "Revenue — TripDesk.ai" };
+export const metadata = { title: "Revenue — TravelBackend.com" };
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 

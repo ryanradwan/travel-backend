@@ -88,7 +88,7 @@ export default function BusinessProfileForm() {
           label="Specialty destinations"
           name="specialty_destinations"
           placeholder="Italy, Caribbean, Japan…"
-          hint="Comma-separated — helps TripDesk personalize responses"
+          hint="Comma-separated — helps TravelBackend personalize responses"
         />
 
         <Input

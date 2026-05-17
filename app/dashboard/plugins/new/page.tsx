@@ -14,7 +14,7 @@ export default function NewPluginPage({ searchParams }: PageProps) {
         <Link href="/dashboard/plugins" className="text-sm text-gray-400 hover:text-navy">← Custom plugins</Link>
         <h1 className="text-2xl font-bold text-navy mt-2">Add Custom Plugin</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Connect any external API to TripDesk. Your API key is encrypted before storage.
+          Connect any external API to TravelBackend. Your API key is encrypted before storage.
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export default function NewPluginPage({ searchParams }: PageProps) {
           type="url"
           required
           placeholder="https://api.yoursystem.com/v1"
-          hint="The root URL for the API. TripDesk will make requests to endpoints under this URL."
+          hint="The root URL for the API. TravelBackend will make requests to endpoints under this URL."
         />
 
         <Input
@@ -59,8 +59,8 @@ export default function NewPluginPage({ searchParams }: PageProps) {
             placeholder="read:bookings, create:reservations, read:availability"
           />
           <p className="text-xs text-gray-400 mt-1">
-            Comma-separated list of what TripDesk is allowed to do with this plugin.
-            Helps TripDesk understand when to use it.
+            Comma-separated list of what TravelBackend is allowed to do with this plugin.
+            Helps TravelBackend understand when to use it.
           </p>
         </div>
 

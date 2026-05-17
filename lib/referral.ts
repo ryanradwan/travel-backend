@@ -36,6 +36,6 @@ export async function creditReferrer(referredUserId: string): Promise<void> {
 
 // Generate the referral share URL
 export function getReferralUrl(referralCode: string): string {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tripdesk.ai";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://travelbackend.com";
   return `${appUrl}/signup?ref=${referralCode}`;
 }

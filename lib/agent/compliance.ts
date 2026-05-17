@@ -31,7 +31,7 @@ export function buildComplianceBlock(
     ? `**Visa Requirements:** Verify current visa requirements for your client's nationality at travel.state.gov or the ${destination} embassy website.`
     : null;
 
-  const priceDisclaimer = `*Prices, schedules, and availability are estimates as of ${today} and subject to change without notice. Always verify with suppliers before confirming with clients. TripDesk.ai is not responsible for third-party pricing changes.*`;
+  const priceDisclaimer = `*Prices, schedules, and availability are estimates as of ${today} and subject to change without notice. Always verify with suppliers before confirming with clients. TravelBackend.com is not responsible for third-party pricing changes.*`;
 
   const parts = [advisoryWarning];
   if (visaReminder) parts.push(visaReminder);

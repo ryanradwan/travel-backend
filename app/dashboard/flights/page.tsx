@@ -4,7 +4,7 @@ import { Plane } from "lucide-react";
 import FlightSearch from "@/components/flights/FlightSearch";
 import { isAmadeusConfigured } from "@/lib/amadeus/client";
 
-export const metadata = { title: "Flight Search — TripDesk.ai" };
+export const metadata = { title: "Flight Search — TravelBackend.com" };
 
 export default async function FlightsPage() {
   const supabase = createClient();

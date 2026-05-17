@@ -4,7 +4,7 @@ import { Inbox } from "lucide-react";
 import InquiryCard from "@/components/inbox/InquiryCard";
 import CopyLinkButton from "@/components/inbox/CopyLinkButton";
 
-export const metadata = { title: "Inquiry Inbox — TripDesk.ai" };
+export const metadata = { title: "Inquiry Inbox — TravelBackend.com" };
 
 interface Inquiry {
   id: string;
@@ -100,7 +100,7 @@ export default async function InboxPage({
           <p className="text-sm font-semibold text-navy mb-2">How the inquiry inbox works</p>
           <ul className="text-sm text-gray-500 space-y-1.5">
             <li>· Share your unique inquiry form link with clients or embed it on your website.</li>
-            <li>· When a client submits, TripDesk reads it instantly and classifies the trip type.</li>
+            <li>· When a client submits, TravelBackend reads it instantly and classifies the trip type.</li>
             <li>· A personalised draft response appears here — you review, edit if needed, and send.</li>
             <li>· You can also add inquiries manually if they came in by phone or WhatsApp.</li>
           </ul>

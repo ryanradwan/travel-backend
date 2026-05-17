@@ -3,7 +3,7 @@ import AuthLayout from "@/components/auth/AuthLayout";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 
 export const metadata: Metadata = {
-  title: "Reset Password — TripDesk.ai",
+  title: "Reset Password — TravelBackend.com",
 };
 
 export default function ForgotPasswordPage() {

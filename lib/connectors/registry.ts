@@ -40,7 +40,7 @@ export interface ConnectorDefinition {
 export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
   // ── STARTER (8 fixed, always included) ──────────────────────────────────
   gmail: {
-    id: "gmail", name: "Gmail", description: "Send and draft emails directly from TripDesk",
+    id: "gmail", name: "Gmail", description: "Send and draft emails directly from TravelBackend",
     category: "google", authType: "oauth2", oauthProvider: "google",
     scopes: ["https://www.googleapis.com/auth/gmail.compose", "https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.readonly"],
     icon: "✉️", color: "bg-red-50",
@@ -250,7 +250,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     availability: "professional",
   },
   typeform: {
-    id: "typeform", name: "Typeform", description: "Create client intake forms that feed into TripDesk",
+    id: "typeform", name: "Typeform", description: "Create client intake forms that feed into TravelBackend",
     category: "productivity", authType: "api_key",
     icon: "📋", color: "bg-pink-50",
     whatItDoes: ["Build client travel preference forms", "Auto-create client profiles from responses", "Collect trip requirements before calls"],
@@ -336,10 +336,10 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     availability: "agency",
   },
   zapier: {
-    id: "zapier", name: "Zapier", description: "Connect TripDesk to any app not natively supported",
+    id: "zapier", name: "Zapier", description: "Connect TravelBackend to any app not natively supported",
     category: "productivity", authType: "api_key",
     icon: "⚡", color: "bg-orange-50",
-    whatItDoes: ["Connect TripDesk to 6,000+ apps", "Build custom automation flows", "Trigger actions in any tool when tasks complete"],
+    whatItDoes: ["Connect TravelBackend to 6,000+ apps", "Build custom automation flows", "Trigger actions in any tool when tasks complete"],
     availability: "agency",
   },
 
@@ -376,7 +376,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
       "Check real-time tour availability for client proposals",
       "Create bookings and send confirmation emails",
       "Manage waivers and customer documents",
-      "Sync capacity and pricing with your TripDesk packages",
+      "Sync capacity and pricing with your TravelBackend packages",
     ],
     availability: "agency",
   },
@@ -387,7 +387,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     whatItDoes: [
       "Manage your tour product inventory in Bókun",
       "Distribute products to Viator, GetYourGuide, and OTAs",
-      "Pull live availability into TripDesk proposals",
+      "Pull live availability into TravelBackend proposals",
       "Process bookings and payments automatically",
     ],
     availability: "agency",
@@ -398,7 +398,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     icon: "📋", color: "bg-indigo-50",
     whatItDoes: [
       "Sync your tour inventory and availability",
-      "Create bookings from TripDesk proposals",
+      "Create bookings from TravelBackend proposals",
       "Send automated booking confirmations",
       "Manage customer waivers and documents",
     ],
@@ -481,7 +481,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     category: "travel", authType: "api_key",
     icon: "🛡️", color: "bg-blue-50",
     whatItDoes: [
-      "Generate travel insurance quotes from within TripDesk",
+      "Generate travel insurance quotes from within TravelBackend",
       "Embed insurance options in client proposals",
       "Track which clients have purchased coverage",
       "Earn commission on policies sold",
@@ -507,7 +507,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     whatItDoes: [
       "Access Virtuoso preferred rates and amenity programs",
       "Add hotel upgrades and inclusions to luxury proposals",
-      "Pull Virtuoso-exclusive itineraries into TripDesk",
+      "Pull Virtuoso-exclusive itineraries into TravelBackend",
       "Track VIP amenities confirmed at each property",
     ],
     availability: "agency",
@@ -520,7 +520,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
       "Access Signature preferred rates and amenities",
       "Add exclusive onboard credits and upgrades to proposals",
       "Track Signature partner bookings and commissions",
-      "Pull preferred supplier inventory into TripDesk",
+      "Pull preferred supplier inventory into TravelBackend",
     ],
     availability: "agency",
   },
@@ -541,7 +541,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     category: "travel", authType: "api_key",
     icon: "🗺️", color: "bg-teal-50",
     whatItDoes: [
-      "Publish TripDesk itineraries as interactive client-facing documents",
+      "Publish TravelBackend itineraries as interactive client-facing documents",
       "Share real-time updates with clients during their trip",
       "Add maps, photos, and supplier details",
       "Clients can access their trip offline on mobile",
@@ -553,7 +553,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     category: "booking", authType: "api_key",
     icon: "🏢", color: "bg-gray-50",
     whatItDoes: [
-      "Sync bookings between TripDesk and Tourplan",
+      "Sync bookings between TravelBackend and Tourplan",
       "Manage FIT and group costing automatically",
       "Pull supplier contracts and net rates into proposals",
       "Handle complex multi-component tour operations",
@@ -568,7 +568,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
       "Distribute your tours to 250+ OTA channels",
       "Sync availability and pricing across all channels",
       "Manage bookings from all channels in one place",
-      "Pull live availability into TripDesk proposals",
+      "Pull live availability into TravelBackend proposals",
     ],
     availability: "agency",
   },
@@ -655,7 +655,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     whatItDoes: [
       "Search and book flights via Galileo and Apollo GDS",
       "Access full NDC airline content and ancillaries",
-      "Pull live availability into TripDesk proposals",
+      "Pull live availability into TravelBackend proposals",
       "Complement Amadeus and Sabre for full market coverage",
     ],
     availability: "agency",
@@ -665,7 +665,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     category: "productivity", authType: "api_key",
     icon: "🗺️", color: "bg-emerald-50",
     whatItDoes: [
-      "Publish TripDesk itineraries as stunning visual Wetu presentations",
+      "Publish TravelBackend itineraries as stunning visual Wetu presentations",
       "Share interactive day-by-day itineraries with clients",
       "Include accommodation photos, maps, and supplier details",
       "Generate PDF and digital versions from one itinerary",
@@ -679,7 +679,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     whatItDoes: [
       "Access wholesale hotel rates from 2M+ properties worldwide",
       "Compare B2B rates across multiple suppliers instantly",
-      "Book accommodation directly within TripDesk workflows",
+      "Book accommodation directly within TravelBackend workflows",
       "Pull net rates into client proposals with your markup",
     ],
     availability: "agency",
@@ -689,7 +689,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     category: "productivity", authType: "api_key",
     icon: "✍️", color: "bg-amber-50",
     whatItDoes: [
-      "Export TripDesk itineraries into Tourwriter for costing",
+      "Export TravelBackend itineraries into Tourwriter for costing",
       "Build detailed margin calculations on complex FIT trips",
       "Generate professional branded proposal documents",
       "Manage supplier rate cards and seasonal pricing",
@@ -702,7 +702,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
     icon: "🛏️", color: "bg-teal-50",
     whatItDoes: [
       "Access 185,000+ hotels at contracted agent-only rates",
-      "Search and book accommodation within TripDesk proposals",
+      "Search and book accommodation within TravelBackend proposals",
       "Pull live availability and net rates into itineraries",
       "Access exclusive deals and last-minute availability",
     ],

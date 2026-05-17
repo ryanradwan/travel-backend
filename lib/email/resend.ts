@@ -7,5 +7,5 @@ export function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
-export const FROM_EMAIL = "TripDesk.ai <hello@tripdesk.ai>";
-export const REPLY_TO = "support@tripdesk.ai";
+export const FROM_EMAIL = "TravelBackend.com <hello@travelbackend.com>";
+export const REPLY_TO = "support@travelbackend.com";

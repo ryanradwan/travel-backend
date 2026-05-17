@@ -4,8 +4,8 @@ import CookieBanner from "@/components/ui/CookieBanner";
 
 export const metadata: Metadata = {
   title: {
-    default: "TripDesk.ai — AI Operations for Travel Businesses",
-    template: "%s — TripDesk.ai",
+    default: "TravelBackend.com — AI Operations for Travel Businesses",
+    template: "%s — TravelBackend.com",
   },
   description: "AI-powered business operations built exclusively for US travel businesses. Build itineraries, research destinations, and publish tour packages in minutes.",
 };

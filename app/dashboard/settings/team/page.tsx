@@ -29,7 +29,7 @@ export default async function TeamSettingsPage() {
       <div>
         <h2 className="text-xl font-bold text-navy">Team Members</h2>
         <p className="text-gray-500 text-sm mt-1">
-          Invite team members to collaborate on your TripDesk workspace.
+          Invite team members to collaborate on your TravelBackend workspace.
         </p>
       </div>
 
@@ -104,8 +104,8 @@ export default async function TeamSettingsPage() {
             <div className="pt-4">
               <p className="text-sm text-gray-500 mb-3">
                 Team member invitations will be available in the next update. For now, contact{" "}
-                <a href="mailto:support@tripdesk.ai" className="text-teal hover:underline">
-                  support@tripdesk.ai
+                <a href="mailto:support@travelbackend.com" className="text-teal hover:underline">
+                  support@travelbackend.com
                 </a>{" "}
                 to add team members to your account.
               </p>

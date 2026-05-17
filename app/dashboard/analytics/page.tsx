@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { TrendingUp, Target, Clock, XCircle } from "lucide-react";
 import MonthlyChart from "@/components/analytics/MonthlyChart";
 
-export const metadata = { title: "Analytics — TripDesk.ai" };
+export const metadata = { title: "Analytics — TravelBackend.com" };
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 

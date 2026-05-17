@@ -62,7 +62,7 @@ export default async function TaskHistoryPage() {
         <div className="card text-center py-12">
           <Clock size={32} className="text-gray-200 mx-auto mb-3" />
           <p className="text-gray-500 text-sm">No tasks yet.</p>
-          <p className="text-gray-400 text-xs mt-1">Run a workflow or ask TripDesk something to get started.</p>
+          <p className="text-gray-400 text-xs mt-1">Run a workflow or ask TravelBackend something to get started.</p>
         </div>
       ) : (
         <div className="card p-0 overflow-hidden">

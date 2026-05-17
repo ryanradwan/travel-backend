@@ -51,7 +51,7 @@ export default function NewSkillPage({ searchParams }: PageProps) {
           />
           <p className="text-xs text-gray-400 mt-1">
             One per line in format: <code className="bg-gray-100 px-1 rounded">field_name: description</code>.
-            These become the variables TripDesk fills in when running this skill.
+            These become the variables TravelBackend fills in when running this skill.
           </p>
         </div>
 

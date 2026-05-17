@@ -145,7 +145,7 @@ function buildEmailHtml(body: string, businessName: string): string {
   </div>
   <div style="padding:32px;">${paragraphs}</div>
   <div style="background:#F4F7FA;padding:16px 32px;border-top:1px solid #E5E7EB;">
-    <p style="color:#9CA3AF;font-size:12px;margin:0;">Sent via <a href="https://tripdesk.ai" style="color:#0E7C7B;">TripDesk.ai</a></p>
+    <p style="color:#9CA3AF;font-size:12px;margin:0;">Sent via <a href="https://travelbackend.com" style="color:#0E7C7B;">TravelBackend.com</a></p>
   </div>
 </div></body></html>`;
 }

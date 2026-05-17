@@ -28,7 +28,7 @@ export default async function BrandSettingsPage({ searchParams }: PageProps) {
       <div>
         <h2 className="text-xl font-bold text-navy">Brand Settings</h2>
         <p className="text-gray-500 text-sm mt-1">
-          Used on PDF proposals and the client portal. Clients will see your brand, not TripDesk.
+          Used on PDF proposals and the client portal. Clients will see your brand, not TravelBackend.
         </p>
       </div>
 

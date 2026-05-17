@@ -13,13 +13,13 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
       <div className="hidden lg:flex lg:w-1/2 bg-navy flex-col justify-between p-12">
         <div>
           <Link href="/" className="text-white text-2xl font-bold tracking-tight">
-            TripDesk<span className="text-teal">.ai</span>
+            TravelBackend<span className="text-teal">.com</span>
           </Link>
           <p className="mt-2 text-blue-200 text-sm">AI-powered operations for travel businesses</p>
         </div>
         <div className="space-y-6">
           <blockquote className="text-white text-lg leading-relaxed">
-            &ldquo;TripDesk handles everything from client proposals to tour publishing — in minutes, not hours.&rdquo;
+            &ldquo;TravelBackend handles everything from client proposals to tour publishing — in minutes, not hours.&rdquo;
           </blockquote>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-teal/30 flex items-center justify-center text-white font-semibold">
@@ -31,7 +31,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
             </div>
           </div>
         </div>
-        <p className="text-blue-400 text-xs">© 2024 TripDesk.ai · All rights reserved</p>
+        <p className="text-blue-400 text-xs">© 2024 TravelBackend.com · All rights reserved</p>
       </div>
 
       {/* Right panel — form */}
@@ -39,7 +39,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
         <div className="w-full max-w-md mx-auto">
           <div className="mb-2 lg:hidden">
             <Link href="/" className="text-navy text-xl font-bold">
-              TripDesk<span className="text-teal">.ai</span>
+              TravelBackend<span className="text-teal">.com</span>
             </Link>
           </div>
           <h1 className="text-2xl font-bold text-navy mb-1">{title}</h1>

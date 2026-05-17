@@ -50,7 +50,7 @@ export async function approveEmailDraft(id: string, editedBody?: string): Promis
   try {
     const resend = getResend();
     await resend.emails.send({
-      from: `${businessName} via TripDesk <${FROM_EMAIL}>`,
+      from: `${businessName} via TravelBackend <${FROM_EMAIL}>`,
       replyTo: user.email!,
       to: d.client_email,
       subject: d.subject,

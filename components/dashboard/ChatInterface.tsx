@@ -327,7 +327,7 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={attachedFiles.length > 0 ? "Add a message about your file(s)…" : "Ask TripDesk anything about your travel business…"}
+                placeholder={attachedFiles.length > 0 ? "Add a message about your file(s)…" : "Ask TravelBackend anything about your travel business…"}
                 className="w-full px-4 py-3 border border-border rounded-card bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent resize-none text-sm leading-relaxed"
                 rows={1}
                 disabled={isStreaming}
@@ -352,7 +352,7 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
           </div>
 
           <p className="text-xs text-gray-400 mt-2 text-center">
-            Attach PDFs, images, or text files · Max 5MB · Press Enter to send · TripDesk may make mistakes — verify all travel advisories and visa info
+            Attach PDFs, images, or text files · Max 5MB · Press Enter to send · TravelBackend may make mistakes — verify all travel advisories and visa info
           </p>
         </div>
       </div>
@@ -401,7 +401,7 @@ function MessageBubble({ message, isCopied, onCopy, isStreaming }: {
             <div className="w-6 h-6 rounded bg-teal/10 flex items-center justify-center">
               <span className="text-teal text-xs font-bold">TD</span>
             </div>
-            <span className="text-xs text-gray-400 font-medium">TripDesk</span>
+            <span className="text-xs text-gray-400 font-medium">TravelBackend</span>
           </div>
         )}
 

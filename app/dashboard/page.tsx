@@ -162,7 +162,7 @@ export default async function DashboardPage() {
           <QuickAction href="/dashboard/workflows/itinerary" icon={<FileText size={20} />} label="Client Itinerary" desc="Turn enquiry into proposal" color="bg-blue-500" />
           <QuickAction href="/dashboard/workflows/research" icon={<Globe size={20} />} label="Destination Report" desc="Full destination research" color="bg-teal" />
           <QuickAction href="/dashboard/workflows/package" icon={<Package size={20} />} label="Tour Package" desc="Build & publish a package" color="bg-purple-500" />
-          <QuickAction href="/dashboard/chat" icon={<MessageSquare size={20} />} label="Ask TripDesk" desc="Free travel question" color="bg-orange-500" />
+          <QuickAction href="/dashboard/chat" icon={<MessageSquare size={20} />} label="Ask TravelBackend" desc="Free travel question" color="bg-orange-500" />
         </div>
       </div>
 
@@ -208,7 +208,7 @@ export default async function DashboardPage() {
               {[
                 { icon: "✈️", title: "Run a workflow", desc: "Build your first client itinerary or destination report.", href: "/dashboard/workflows/itinerary" },
                 { icon: "📋", title: "Track a booking", desc: "Add a deal to your pipeline to track value and commission.", href: "/dashboard/pipeline?add=1" },
-                { icon: "🔌", title: "Connect an app", desc: "Link Gmail or Google Drive so TripDesk can save and send.", href: "/dashboard/connectors" },
+                { icon: "🔌", title: "Connect an app", desc: "Link Gmail or Google Drive so TravelBackend can save and send.", href: "/dashboard/connectors" },
               ].map(({ icon, title, desc, href }) => (
                 <Link key={href} href={href} className="card hover:border-teal hover:shadow-sm transition-all group flex items-start gap-3 py-4">
                   <span className="text-xl leading-none flex-shrink-0">{icon}</span>
@@ -239,11 +239,11 @@ export default async function DashboardPage() {
       {connectedCount === 0 && used === 0 && (
         <div className="card border-teal border-2">
           <h3 className="text-sm font-bold text-navy mb-1">Get started in 3 steps</h3>
-          <p className="text-xs text-gray-500 mb-4">You&apos;re set up — here&apos;s how to get the most out of TripDesk.</p>
+          <p className="text-xs text-gray-500 mb-4">You&apos;re set up — here&apos;s how to get the most out of TravelBackend.</p>
           <div className="space-y-3">
             {[
               { step: 1, label: "Run your first workflow", desc: "Try the Client Itinerary — takes 2 minutes.", href: "/dashboard/workflows/itinerary", done: used > 0 },
-              { step: 2, label: "Connect Gmail or Google Drive", desc: "So TripDesk can save and send on your behalf.", href: "/dashboard/connectors", done: connectedCount > 0 },
+              { step: 2, label: "Connect Gmail or Google Drive", desc: "So TravelBackend can save and send on your behalf.", href: "/dashboard/connectors", done: connectedCount > 0 },
               { step: 3, label: "Set your brand colours and logo", desc: "For branded PDF proposals and the client portal.", href: "/dashboard/settings/brand", done: false },
             ].map(({ step, label, desc, href, done }) => (
               <Link key={step} href={href} className="flex items-start gap-3 group">

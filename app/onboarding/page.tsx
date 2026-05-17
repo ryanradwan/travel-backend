@@ -5,7 +5,7 @@ import AuthLayout from "@/components/auth/AuthLayout";
 import BusinessProfileForm from "@/components/auth/BusinessProfileForm";
 
 export const metadata: Metadata = {
-  title: "Set Up Your Business — TripDesk.ai",
+  title: "Set Up Your Business — TravelBackend.com",
 };
 
 export default async function OnboardingPage() {
@@ -26,7 +26,7 @@ export default async function OnboardingPage() {
   return (
     <AuthLayout
       title="Tell us about your business"
-      subtitle="This helps TripDesk.ai personalise every task to your specific travel business. Takes 60 seconds."
+      subtitle="This helps TravelBackend.com personalise every task to your specific travel business. Takes 60 seconds."
     >
       <BusinessProfileForm />
     </AuthLayout>

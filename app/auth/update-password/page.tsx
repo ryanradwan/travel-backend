@@ -3,7 +3,7 @@ import AuthLayout from "@/components/auth/AuthLayout";
 import UpdatePasswordForm from "@/components/auth/UpdatePasswordForm";
 
 export const metadata: Metadata = {
-  title: "Set New Password — TripDesk.ai",
+  title: "Set New Password — TravelBackend.com",
 };
 
 export default function UpdatePasswordPage() {

@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { checkTaskQuota, checkReportQuota, incrementReportUsage, createTask, completeTask, failTask, updateTaskStep } from "@/lib/agent/tasks";
+import { checkTaskQuota, checkReportQuota, checkItineraryQuota, checkPackageQuota, incrementReportUsage, incrementItineraryUsage, incrementPackageUsage, createTask, completeTask, failTask, updateTaskStep } from "@/lib/agent/tasks";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
 import { getMemoryContext, extractAndSaveMemories } from "@/lib/agent/memory";
 import { buildComplianceBlock, detectDestination } from "@/lib/agent/compliance";
@@ -58,21 +58,19 @@ export async function POST(req: Request) {
   // On first step — check quota and create task
   let taskId = existingTaskId;
   if (!existingTaskId) {
-    // Research reports have their own separate quota
-    if (workflowId === "research") {
-      const quota = await checkReportQuota(user.id);
+    // Each workflow has its own separate quota
+    const quotaMap = {
+      research: { check: () => checkReportQuota(user.id), label: "destination reports" },
+      itinerary: { check: () => checkItineraryQuota(user.id), label: "itineraries" },
+      package: { check: () => checkPackageQuota(user.id), label: "tour packages" },
+    };
+    const quotaEntry = quotaMap[workflowId as keyof typeof quotaMap];
+    if (quotaEntry) {
+      const quota = await quotaEntry.check();
       if (!quota.allowed) {
         const msg = quota.limit === -1
           ? "Your account access has been paused. Please check your billing settings."
-          : `You've used all ${quota.limit} destination reports this month. Upgrade to run more.`;
-        return Response.json({ error: msg }, { status: 402 });
-      }
-    } else {
-      const quota = await checkTaskQuota(user.id);
-      if (!quota.allowed) {
-        const msg = quota.limit === -1
-          ? "Your account access has been paused. Please check your billing settings."
-          : `You've used all ${quota.limit} tasks this month.`;
+          : `You've used all ${quota.limit} ${quotaEntry.label} this month. Upgrade your plan to run more.`;
         return Response.json({ error: msg }, { status: 402 });
       }
     }
@@ -153,18 +151,21 @@ export async function POST(req: Request) {
         fullOutput += buildComplianceBlock(destination, null, false, today).fullBlock;
       }
 
+      // Increment the correct quota counter and complete the task
+      const supabaseComplete = createClient();
+      await supabaseComplete.from("tasks").update({
+        status: "completed",
+        output: fullOutput,
+        tokens_used: 0,
+        completed_at: new Date().toISOString(),
+      }).eq("id", taskId);
+
       if (workflowId === "research") {
         await incrementReportUsage(user.id);
-        // Complete task without incrementing task usage
-        const supabaseAdmin = createClient();
-        await supabaseAdmin.from("tasks").update({
-          status: "completed",
-          output: fullOutput,
-          tokens_used: 0,
-          completed_at: new Date().toISOString(),
-        }).eq("id", taskId);
-      } else {
-        await completeTask(taskId, user.id, fullOutput, 0);
+      } else if (workflowId === "itinerary") {
+        await incrementItineraryUsage(user.id);
+      } else if (workflowId === "package") {
+        await incrementPackageUsage(user.id);
       }
       extractAndSaveMemories(user.id, taskId, input, fullOutput).catch(() => {});
     }

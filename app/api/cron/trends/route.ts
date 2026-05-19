@@ -72,7 +72,7 @@ export async function GET(req: Request) {
       try {
         const resend = getResend();
         await resend.emails.send({
-          from: `TravelBackend.com <${FROM_EMAIL}>`,
+          from: `TravelBackend <${FROM_EMAIL}>`,
           to: userEmail,
           subject: `Your weekly destination trends — ${new Date(weekOf).toLocaleDateString("en-US", { month: "long", day: "numeric" })}`,
           html: buildTrendReportEmail(trends, profile.business_name, weekOf, appUrl),

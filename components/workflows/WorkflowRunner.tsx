@@ -41,75 +41,57 @@ export default function WorkflowRunner({ workflowId, prefillInput }: WorkflowRun
     setError(null);
     setFinalOutput("");
 
-    // Initialise all steps as pending
     const initial: Record<number, StepState> = {};
     workflow.steps.forEach((s) => { initial[s.number] = { status: "pending" }; });
     setSteps(initial);
 
     abortRef.current = new AbortController();
 
+    let currentTaskId: string | null = null;
+    const previousOutputs: Record<number, string> = {};
+    let outputSoFar = "";
+
     try {
-      const res = await fetch("/api/workflows", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workflowId, input }),
-        signal: abortRef.current.signal,
-      });
+      for (const step of workflow.steps) {
+        if (abortRef.current.signal.aborted) break;
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Failed to start workflow");
-      }
+        updateStep(step.number, { status: "running" });
 
-      const reader = res.body!.getReader();
-      const decoder = new TextDecoder();
-      let outputSoFar = "";
+        const stepRes = await fetch("/api/workflows/step", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            workflowId,
+            stepNumber: step.number,
+            input,
+            previousOutputs,
+            taskId: currentTaskId,
+          }),
+          signal: abortRef.current.signal,
+        });
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const data = await stepRes.json() as { taskId: string; stepOutput: string; skipped: boolean; error?: string };
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n\n").filter((l) => l.startsWith("data: "));
+        if (!stepRes.ok) {
+          throw new Error(data.error ?? "Step failed");
+        }
 
-        for (const line of lines) {
-          try {
-            const event = JSON.parse(line.slice(6));
 
-            switch (event.type) {
-              case "step_start":
-                updateStep(event.step, { status: "running" });
-                break;
+        currentTaskId = data.taskId;
 
-              case "step_complete":
-                updateStep(event.step, { status: "complete", output: event.text });
-                outputSoFar += `\n\n## ${event.stepName}\n${event.text ?? ""}`;
-                setFinalOutput(outputSoFar);
-                break;
-
-              case "step_skip":
-                updateStep(event.step, { status: "skipped", output: event.text });
-                break;
-
-              case "output":
-                setFinalOutput((prev) => prev + (event.text ?? ""));
-                break;
-
-              case "done":
-                setPhase("done");
-                if (event.taskId) setTaskId(event.taskId);
-                break;
-
-              case "error":
-                setError(event.error);
-                setPhase("input");
-                break;
-            }
-          } catch {
-            // partial chunk
-          }
+        if (data.skipped) {
+          updateStep(step.number, { status: "skipped", output: data.stepOutput });
+        } else {
+          previousOutputs[step.number] = data.stepOutput;
+          updateStep(step.number, { status: "complete", output: data.stepOutput });
+          outputSoFar += `\n\n## ${step.name}\n${data.stepOutput}`;
+          setFinalOutput(outputSoFar);
         }
       }
+
+      if (currentTaskId) setTaskId(currentTaskId);
+      setPhase("done");
+
     } catch (err) {
       if ((err as Error).name === "AbortError") {
         setPhase("input");

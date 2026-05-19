@@ -25,7 +25,7 @@ interface BillingPageProps {
 const PLAN_FEATURES = {
   starter: [
     "7-day free trial",
-    "10 itineraries/month",
+    "5 itineraries/month",
     "5 destination reports/month",
     "5 tour packages/month",
     "1 seat",
@@ -37,7 +37,7 @@ const PLAN_FEATURES = {
   ],
   professional: [
     "7-day free trial",
-    "40 itineraries/month",
+    "15 itineraries/month",
     "15 destination reports/month",
     "15 tour packages/month",
     "5 seats",

@@ -17,8 +17,8 @@ const REPORT_LIMITS: Record<string, number> = {
 };
 
 const ITINERARY_LIMITS: Record<string, number> = {
-  starter: 10,
-  professional: 40,
+  starter: 5,
+  professional: 15,
   agency: Infinity,
   enterprise: Infinity,
 };

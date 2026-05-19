@@ -26,6 +26,7 @@ const PLAN_FEATURES = {
   starter: [
     "7-day free trial",
     "30 tasks/month",
+    "5 destination reports/month",
     "1 seat",
     "8 connectors (Gmail, Drive, Calendar, Docs, WhatsApp, Canva, Skyscanner, Mailchimp)",
     "3 custom skills",
@@ -36,6 +37,7 @@ const PLAN_FEATURES = {
   ],
   professional: [
     "100 tasks/month",
+    "15 destination reports/month",
     "5 seats",
     "20 connectors",
     "10 custom skills",
@@ -46,6 +48,7 @@ const PLAN_FEATURES = {
   ],
   agency: [
     "Unlimited tasks",
+    "Unlimited destination reports",
     "Unlimited seats",
     "All connectors (current + future)",
     "Unlimited custom skills & plugins",

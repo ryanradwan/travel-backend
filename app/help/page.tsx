@@ -27,7 +27,7 @@ const FAQ = [
     questions: [
       {
         q: "How many tasks do I get per month?",
-        a: "Starter: 30 tasks/month. Professional: 100 tasks/month. Agency: Unlimited. Tasks reset on the 1st of each month. If you run out, you can purchase top-up credits ($5 for 10 tasks on Starter, $4 on Professional) or upgrade your plan.",
+        a: "Starter: 30 tasks/month + 5 destination reports. Professional: 100 tasks/month + 15 destination reports. Agency: Unlimited tasks and reports. Tasks reset on the 1st of each month. If you run out, you can purchase top-up credits ($5 for 10 tasks on Starter, $4 on Professional) or upgrade your plan.",
       },
       {
         q: "What happens if a task fails?",

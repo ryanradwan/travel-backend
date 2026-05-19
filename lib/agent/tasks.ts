@@ -30,6 +30,13 @@ const PACKAGE_LIMITS: Record<string, number> = {
   enterprise: Infinity,
 };
 
+const CREDIT_LIMITS: Record<string, number> = {
+  starter: 20,
+  professional: 50,
+  agency: Infinity,
+  enterprise: Infinity,
+};
+
 export async function checkTaskQuota(userId: string): Promise<{
   allowed: boolean;
   used: number;
@@ -159,6 +166,32 @@ export async function incrementPackageUsage(userId: string): Promise<void> {
   const supabase = createClient();
   const month = new Date().toISOString().slice(0, 7);
   await supabase.rpc("increment_package_usage", { p_user_id: userId, p_month: month });
+}
+
+export async function checkCreditsQuota(userId: string): Promise<{
+  allowed: boolean; used: number; limit: number; tier: string;
+}> {
+  const supabase = createClient();
+  const month = new Date().toISOString().slice(0, 7);
+  const [userResult, usageResult] = await Promise.all([
+    supabase.from("users").select("subscription_tier, subscription_status, trial_ends_at").eq("id", userId).single(),
+    supabase.from("task_usage").select("credits_used, credits_limit").eq("user_id", userId).eq("month", month).single(),
+  ]);
+  const userData = userResult.data as { subscription_tier: string; subscription_status: string; trial_ends_at: string | null } | null;
+  const usageData = usageResult.data as { credits_used: number; credits_limit: number } | null;
+  const tier = userData?.subscription_tier ?? "starter";
+  const limit = CREDIT_LIMITS[tier] ?? 20;
+  const used = usageData?.credits_used ?? 0;
+  if (userData?.subscription_status === "canceled" || userData?.subscription_status === "paused") return { allowed: false, used, limit, tier };
+  if (userData?.subscription_status === "trialing" && userData.trial_ends_at && new Date(userData.trial_ends_at) < new Date()) return { allowed: false, used, limit, tier };
+  if (limit === Infinity) return { allowed: true, used, limit: -1, tier };
+  return { allowed: used < limit, used, limit, tier };
+}
+
+export async function incrementCreditsUsage(userId: string, amount: number = 1): Promise<void> {
+  const supabase = createClient();
+  const month = new Date().toISOString().slice(0, 7);
+  await supabase.rpc("increment_credits_usage", { p_user_id: userId, p_month: month, p_amount: amount });
 }
 
 export async function createTask(

@@ -53,9 +53,13 @@ export default async function DashboardPage() {
   const usagePct = isUnlimited ? 0 : Math.min(100, Math.round((used / limit) * 100));
   const isLow = !isUnlimited && usagePct >= 80;
 
-  const reportsUsed = (usage as (TaskUsage & { reports_used?: number; reports_limit?: number }) | null)?.reports_used ?? 0;
-  const reportsLimit = (usage as (TaskUsage & { reports_used?: number; reports_limit?: number }) | null)?.reports_limit ?? (isUnlimited ? -1 : 5);
+  type ExtendedUsage = TaskUsage & { reports_used?: number; reports_limit?: number; credits_used?: number; credits_limit?: number };
+  const reportsUsed = (usage as ExtendedUsage | null)?.reports_used ?? 0;
+  const reportsLimit = (usage as ExtendedUsage | null)?.reports_limit ?? (isUnlimited ? -1 : 5);
   const reportsLow = !isUnlimited && reportsLimit > 0 && reportsUsed >= reportsLimit * 0.8;
+  const creditsUsed = (usage as ExtendedUsage | null)?.credits_used ?? 0;
+  const creditsLimit = (usage as ExtendedUsage | null)?.credits_limit ?? (isUnlimited ? -1 : 20);
+  const creditsLow = !isUnlimited && creditsLimit > 0 && creditsUsed >= creditsLimit * 0.8;
 
   const connectedCount = connectors.filter(c => c.status === "connected").length;
   const unhealthyCount = connectors.filter(c => c.status === "needs_reconnect" || c.status === "error").length;
@@ -112,16 +116,16 @@ export default async function DashboardPage() {
       {/* Stats bar */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
-          icon={<Zap size={16} className={isLow ? "text-orange-500" : "text-teal"} />}
-          label="Tasks this month"
-          value={isUnlimited ? `${used} used` : `${used} / ${limit}`}
-          sub={isUnlimited ? "Unlimited plan" : `${limit - used} remaining`}
-          accent={isLow ? "border-orange-300 bg-orange-50" : ""}
-          href="/dashboard/tasks"
+          icon={<Zap size={16} className={creditsLow ? "text-orange-500" : "text-teal"} />}
+          label="Credits this month"
+          value={isUnlimited ? `${creditsUsed} used` : `${creditsUsed} / ${creditsLimit}`}
+          sub={isUnlimited ? "Unlimited plan" : `${creditsLimit - creditsUsed} remaining`}
+          accent={creditsLow ? "border-orange-300 bg-orange-50" : ""}
+          href="/dashboard/settings/billing"
         >
-          {!isUnlimited && (
+          {!isUnlimited && creditsLimit > 0 && (
             <div className="mt-2 w-full bg-gray-100 rounded-full h-1.5">
-              <div className={`h-1.5 rounded-full ${isLow ? "bg-orange-400" : "bg-teal"}`} style={{ width: `${usagePct}%` }} />
+              <div className={`h-1.5 rounded-full ${creditsLow ? "bg-orange-400" : "bg-teal"}`} style={{ width: `${Math.min(100, Math.round((creditsUsed / creditsLimit) * 100))}%` }} />
             </div>
           )}
         </StatCard>

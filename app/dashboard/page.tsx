@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import RecentTasks from "@/components/dashboard/RecentTasks";
 import ConnectorStatus from "@/components/dashboard/ConnectorStatus";
-import TravelAdvisoryFeedWide from "@/components/dashboard/TravelAdvisoryFeedWide";
 import CurrencyRates from "@/components/dashboard/travel/CurrencyRates";
 import TripCountdowns from "@/components/dashboard/travel/TripCountdowns";
 import PeakSeasonCalendar from "@/components/dashboard/travel/PeakSeasonCalendar";
@@ -256,7 +255,6 @@ export default async function DashboardPage() {
 
       {/* Travel Advisories — full width below the grid */}
       <Suspense fallback={<div className="card h-20 animate-pulse bg-gray-50" />}>
-        <TravelAdvisoryFeedWide />
       </Suspense>
 
       {/* Onboarding checklist — show if connectors = 0 and tasks = 0 */}

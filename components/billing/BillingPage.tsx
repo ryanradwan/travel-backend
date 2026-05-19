@@ -16,7 +16,6 @@ interface BillingPageProps {
   currentStatus: string;
   trialEndsAt: string | null;
   creditsUsed: number;
-  creditsLimit: number;
   hasStripeCustomer: boolean;
   priceIds: PriceIds;
   referralCode: string | null;
@@ -28,7 +27,7 @@ const PLAN_FEATURES = {
     "5 itineraries/month",
     "5 destination reports/month",
     "5 tour packages/month",
-    "20 credits/month",
+    "Standard monthly AI usage",
     "1 seat",
     "8 connectors",
     "3 custom skills",
@@ -41,7 +40,7 @@ const PLAN_FEATURES = {
     "15 itineraries/month",
     "15 destination reports/month",
     "15 tour packages/month",
-    "50 credits/month",
+    "4× more monthly AI usage",
     "5 seats",
     "20 connectors",
     "10 custom skills",
@@ -54,7 +53,7 @@ const PLAN_FEATURES = {
     "Unlimited itineraries",
     "Unlimited destination reports",
     "Unlimited tour packages",
-    "Unlimited credits",
+    "Unlimited AI usage",
     "Unlimited seats",
     "All connectors (current + future)",
     "Unlimited custom skills & plugins",
@@ -69,7 +68,6 @@ export default function BillingPage({
   currentStatus,
   trialEndsAt,
   creditsUsed,
-  creditsLimit,
   hasStripeCustomer,
   priceIds,
   referralCode,
@@ -149,20 +147,22 @@ export default function BillingPage({
       {/* Current usage */}
       <div className="card">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-navy">Current Usage</h3>
+          <h3 className="font-semibold text-navy">Monthly AI Usage</h3>
           <span className="text-xs text-gray-400 capitalize">{currentTier} · {currentStatus}</span>
         </div>
         <div className="flex items-end gap-2 mb-2">
-          <span className="text-2xl font-bold text-navy">{creditsUsed}</span>
+          <span className="text-2xl font-bold text-navy">
+            {currentTier === "agency" || currentTier === "enterprise" ? "∞" : `${creditsUsed}%`}
+          </span>
           <span className="text-gray-400 text-sm mb-0.5">
-            {creditsLimit === 9999 ? "/ unlimited credits" : `/ ${creditsLimit} credits this month`}
+            {currentTier === "agency" || currentTier === "enterprise" ? "unlimited" : "of monthly usage used"}
           </span>
         </div>
-        {creditsLimit !== 9999 && (
+        {currentTier !== "agency" && currentTier !== "enterprise" && (
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div
-              className="h-2 rounded-full bg-teal transition-all"
-              style={{ width: `${Math.min(100, Math.round((creditsUsed / creditsLimit) * 100))}%` }}
+              className={`h-2 rounded-full transition-all ${creditsUsed >= 80 ? "bg-orange-400" : "bg-teal"}`}
+              style={{ width: `${creditsUsed}%` }}
             />
           </div>
         )}

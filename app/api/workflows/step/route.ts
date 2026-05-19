@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { checkReportQuota, checkItineraryQuota, checkPackageQuota, incrementReportUsage, incrementItineraryUsage, incrementPackageUsage, createTask, failTask, updateTaskStep } from "@/lib/agent/tasks";
+import { checkReportQuota, checkItineraryQuota, checkPackageQuota, incrementReportUsage, incrementItineraryUsage, incrementPackageUsage, incrementTokenUsage, createTask, failTask, updateTaskStep } from "@/lib/agent/tasks";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
 import { getMemoryContext, extractAndSaveMemories } from "@/lib/agent/memory";
 import { buildComplianceBlock, detectDestination } from "@/lib/agent/compliance";
@@ -127,6 +127,8 @@ export async function POST(req: Request) {
     });
 
     const text = response.content[0].type === "text" ? response.content[0].text : "";
+    const stepTokens = (response.usage?.input_tokens ?? 0) + (response.usage?.output_tokens ?? 0);
+    await incrementTokenUsage(user.id, stepTokens);
     await updateTaskStep(taskId, step.number, step.name, "completed");
 
     // On last AI step — complete the task

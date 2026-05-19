@@ -37,6 +37,13 @@ const CREDIT_LIMITS: Record<string, number> = {
   enterprise: Infinity,
 };
 
+const TOKEN_LIMITS: Record<string, number> = {
+  starter: 500000,
+  professional: 2000000,
+  agency: Infinity,
+  enterprise: Infinity,
+};
+
 export async function checkTaskQuota(userId: string): Promise<{
   allowed: boolean;
   used: number;
@@ -192,6 +199,34 @@ export async function incrementCreditsUsage(userId: string, amount: number = 1):
   const supabase = createClient();
   const month = new Date().toISOString().slice(0, 7);
   await supabase.rpc("increment_credits_usage", { p_user_id: userId, p_month: month, p_amount: amount });
+}
+
+export async function checkTokenQuota(userId: string): Promise<{
+  allowed: boolean; used: number; limit: number; pct: number; tier: string;
+}> {
+  const supabase = createClient();
+  const month = new Date().toISOString().slice(0, 7);
+  const [userResult, usageResult] = await Promise.all([
+    supabase.from("users").select("subscription_tier, subscription_status, trial_ends_at").eq("id", userId).single(),
+    supabase.from("task_usage").select("tokens_used, tokens_limit").eq("user_id", userId).eq("month", month).single(),
+  ]);
+  const userData = userResult.data as { subscription_tier: string; subscription_status: string; trial_ends_at: string | null } | null;
+  const usageData = usageResult.data as { tokens_used: number; tokens_limit: number } | null;
+  const tier = userData?.subscription_tier ?? "starter";
+  const limit = TOKEN_LIMITS[tier] ?? 500000;
+  const used = usageData?.tokens_used ?? 0;
+  if (userData?.subscription_status === "canceled" || userData?.subscription_status === "paused") return { allowed: false, used, limit, pct: 100, tier };
+  if (userData?.subscription_status === "trialing" && userData.trial_ends_at && new Date(userData.trial_ends_at) < new Date()) return { allowed: false, used, limit, pct: 100, tier };
+  if (limit === Infinity) return { allowed: true, used, limit: -1, pct: 0, tier };
+  const pct = Math.min(100, Math.round((used / limit) * 100));
+  return { allowed: used < limit, used, limit, pct, tier };
+}
+
+export async function incrementTokenUsage(userId: string, tokens: number): Promise<void> {
+  if (tokens <= 0) return;
+  const supabase = createClient();
+  const month = new Date().toISOString().slice(0, 7);
+  await supabase.rpc("increment_token_usage", { p_user_id: userId, p_month: month, p_tokens: tokens });
 }
 
 export async function createTask(

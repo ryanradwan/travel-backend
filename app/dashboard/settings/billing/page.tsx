@@ -35,7 +35,7 @@ export default async function BillingSettingsPage() {
       .single(),
     supabase
       .from("task_usage")
-      .select("credits_used, credits_limit")
+      .select("tokens_used, tokens_limit")
       .eq("user_id", user.id)
       .eq("month", month)
       .single(),
@@ -49,15 +49,19 @@ export default async function BillingSettingsPage() {
     referral_code: string | null;
   } | null;
 
-  const usageData = usageResult.data as { credits_used: number; credits_limit: number } | null;
+  const usageData = usageResult.data as { tokens_used: number; tokens_limit: number } | null;
+  const tier = userData?.subscription_tier ?? "starter";
+  const defaultLimit = tier === "professional" ? 2000000 : tier === "agency" ? -1 : 500000;
+  const tokensUsed = usageData?.tokens_used ?? 0;
+  const tokensLimit = usageData?.tokens_limit ?? defaultLimit;
+  const usagePct = tokensLimit === -1 ? 0 : Math.min(100, Math.round((tokensUsed / tokensLimit) * 100));
 
   return (
     <BillingPage
-      currentTier={userData?.subscription_tier ?? "starter"}
+      currentTier={tier}
       currentStatus={userData?.subscription_status ?? "trialing"}
       trialEndsAt={userData?.trial_ends_at ?? null}
-      creditsUsed={usageData?.credits_used ?? 0}
-      creditsLimit={usageData?.credits_limit ?? 20}
+      creditsUsed={usagePct}
       hasStripeCustomer={!!userData?.stripe_customer_id}
       priceIds={getPriceIds()}
       referralCode={userData?.referral_code ?? null}

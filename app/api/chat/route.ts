@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
 import { getMemoryContext, extractAndSaveMemories } from "@/lib/agent/memory";
 import { requiresComplianceCheck, detectDestination, buildComplianceBlock } from "@/lib/agent/compliance";
-import { checkCreditsQuota, incrementCreditsUsage, createTask, failTask } from "@/lib/agent/tasks";
+import { checkTokenQuota, incrementTokenUsage, createTask, failTask } from "@/lib/agent/tasks";
 import { classifyIntent } from "@/lib/agent/intent";
 import { type ChatMessage } from "@/lib/agent/types";
 import { needsWebSearch, searchWeb, buildSearchContext } from "@/lib/tools/web-search";
@@ -67,14 +67,13 @@ export async function POST(req: Request) {
   const intent = classifyIntent(userInput);
   const isBillableTask = intent === "task" || workflow !== "general";
 
-  if (isBillableTask) {
-    const quota = await checkCreditsQuota(user.id);
-    if (!quota.allowed) {
-      const msg = quota.limit === -1
-        ? "Your account access has been paused. Please check your billing settings."
-        : `You've used all ${quota.limit} credits for this month. Upgrade your plan to continue running tasks.`;
-      return Response.json({ error: msg }, { status: 402 });
-    }
+  // Check token quota for all requests (questions and tasks)
+  const tokenQuota = await checkTokenQuota(user.id);
+  if (!tokenQuota.allowed) {
+    const msg = tokenQuota.limit === -1
+      ? "Your account access has been paused. Please check your billing settings."
+      : `You've used all of your monthly AI usage. Upgrade your plan to continue.`;
+    return Response.json({ error: msg }, { status: 402 });
   }
 
   const [profileResult, memoryContext] = await Promise.all([
@@ -166,8 +165,10 @@ export async function POST(req: Request) {
 
         const totalTokens = inputTokens + outputTokens;
 
+        // Always track token usage
+        await incrementTokenUsage(user.id, totalTokens);
+
         if (isBillableTask && taskId) {
-          // Save task output and deduct 1 credit
           const supabase2 = createClient();
           await supabase2.from("tasks").update({
             status: "completed",
@@ -175,11 +176,10 @@ export async function POST(req: Request) {
             tokens_used: totalTokens,
             completed_at: new Date().toISOString(),
           }).eq("id", taskId);
-          await incrementCreditsUsage(user.id, 1);
           extractAndSaveMemories(user.id, taskId, userInput, fullResponse).catch(() => {});
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", taskId, isTask: true, creditsUsed: 1, tokensUsed: totalTokens })}\n\n`));
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", taskId, isTask: true, tokensUsed: totalTokens })}\n\n`));
         } else {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", isTask: false })}\n\n`));
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", isTask: false, tokensUsed: totalTokens })}\n\n`));
         }
 
       } catch (error) {

@@ -27,7 +27,7 @@ const groups: NavGroup[] = [
     label: "",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/dashboard/chat", label: "Ask TravelBackend", icon: MessageSquare },
+      { href: "/dashboard/chat", label: "TravelBackend", icon: MessageSquare },
     ],
   },
   {

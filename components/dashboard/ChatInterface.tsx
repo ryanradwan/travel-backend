@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, RotateCcw, Copy, CheckCheck, Paperclip, X, FileText, Image, File, Globe } from "lucide-react";
+import { Send, RotateCcw, Copy, CheckCheck, Paperclip, X, FileText, Image, File, Globe, Zap, MessageCircle } from "lucide-react";
+import { classifyIntent } from "@/lib/agent/intent";
 import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import { type ChatMessage } from "@/lib/agent/types";
@@ -78,6 +79,7 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
   const [isSearching, setIsSearching] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingTaskText, setPendingTaskText] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -129,10 +131,17 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
     setAttachedFiles((prev) => prev.filter((_, i) => i !== idx));
   }
 
-  const sendMessage = useCallback(async (text?: string) => {
+  const sendMessage = useCallback(async (text?: string, skipConfirm = false) => {
     const userText = (text ?? input).trim();
     if ((!userText && attachedFiles.length === 0) || isStreaming) return;
 
+    // Intercept tasks for credit confirmation
+    if (!skipConfirm && classifyIntent(userText) === "task") {
+      setPendingTaskText(userText);
+      return;
+    }
+
+    setPendingTaskText(null);
     const filesToSend = [...attachedFiles];
     setInput("");
     setAttachedFiles([]);
@@ -301,6 +310,35 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
             <p className="text-xs text-red-500 mb-2">{fileError}</p>
           )}
 
+          {/* Credit confirmation banner */}
+          {pendingTaskText && (
+            <div className="mb-3 bg-teal/5 border border-teal/20 rounded-xl px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Zap size={13} className="text-teal" />
+                    <span className="text-xs font-semibold text-teal">This will use 1 credit</span>
+                  </div>
+                  <p className="text-xs text-gray-500 line-clamp-2">{pendingTaskText}</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => setPendingTaskText(null)}
+                    className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => { setInput(""); sendMessage(pendingTaskText, true); }}
+                    className="text-xs bg-teal text-white px-3 py-1 rounded font-semibold hover:opacity-90 transition-opacity"
+                  >
+                    Execute →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-2 items-end">
             {/* File attach button */}
             <button
@@ -327,7 +365,7 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={attachedFiles.length > 0 ? "Add a message about your file(s)…" : "Ask TravelBackend anything about your travel business…"}
+                placeholder={attachedFiles.length > 0 ? "Add a message about your file(s)…" : "Ask a question or run a task…"}
                 className="w-full px-4 py-3 border border-border rounded-card bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent resize-none text-sm leading-relaxed"
                 rows={1}
                 disabled={isStreaming}
@@ -351,9 +389,28 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
             )}
           </div>
 
-          <p className="text-xs text-gray-400 mt-2 text-center">
-            Attach PDFs, images, or text files · Max 5MB · Press Enter to send · TravelBackend may make mistakes — verify all travel advisories and visa info
-          </p>
+          {/* Intent indicator */}
+          {input.trim() && !isStreaming && (
+            <div className="flex items-center gap-1.5 mt-2">
+              {classifyIntent(input) === "task" ? (
+                <>
+                  <Zap size={11} className="text-teal" />
+                  <span className="text-xs text-teal font-medium">Task — uses 1 credit</span>
+                </>
+              ) : (
+                <>
+                  <MessageCircle size={11} className="text-gray-400" />
+                  <span className="text-xs text-gray-400">Question — free</span>
+                </>
+              )}
+            </div>
+          )}
+
+          {!input.trim() && (
+            <p className="text-xs text-gray-400 mt-2 text-center">
+              Questions are free · Tasks use 1 credit · Press Enter to send
+            </p>
+          )}
         </div>
       </div>
     </div>

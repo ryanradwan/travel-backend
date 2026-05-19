@@ -185,7 +185,7 @@ export default async function DashboardPage() {
           <QuickAction href="/dashboard/workflows/itinerary" icon={<FileText size={20} />} label="Client Itinerary" desc="Turn enquiry into proposal" color="bg-blue-500" />
           <QuickAction href="/dashboard/workflows/research" icon={<Globe size={20} />} label="Destination Report" desc="Full destination research" color="bg-teal" />
           <QuickAction href="/dashboard/workflows/package" icon={<Package size={20} />} label="Tour Package" desc="Build & publish a package" color="bg-purple-500" />
-          <QuickAction href="/dashboard/chat" icon={<MessageSquare size={20} />} label="Ask TravelBackend" desc="Free travel question" color="bg-orange-500" />
+          <QuickAction href="/dashboard/chat" icon={<MessageSquare size={20} />} label="TravelBackend" desc="Questions free · Tasks 1 credit" color="bg-orange-500" />
         </div>
       </div>
 

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
 import { getMemoryContext, extractAndSaveMemories } from "@/lib/agent/memory";
 import { requiresComplianceCheck, detectDestination, buildComplianceBlock } from "@/lib/agent/compliance";
-import { checkTaskQuota, createTask, completeTask, failTask } from "@/lib/agent/tasks";
+import { checkCreditsQuota, incrementCreditsUsage, createTask, failTask } from "@/lib/agent/tasks";
 import { classifyIntent } from "@/lib/agent/intent";
 import { type ChatMessage } from "@/lib/agent/types";
 import { needsWebSearch, searchWeb, buildSearchContext } from "@/lib/tools/web-search";
@@ -68,11 +68,11 @@ export async function POST(req: Request) {
   const isBillableTask = intent === "task" || workflow !== "general";
 
   if (isBillableTask) {
-    const quota = await checkTaskQuota(user.id);
+    const quota = await checkCreditsQuota(user.id);
     if (!quota.allowed) {
       const msg = quota.limit === -1
         ? "Your account access has been paused. Please check your billing settings."
-        : `You've used all ${quota.limit} tasks for this month. Upgrade your plan or add top-up credits to continue.`;
+        : `You've used all ${quota.limit} credits for this month. Upgrade your plan to continue running tasks.`;
       return Response.json({ error: msg }, { status: 402 });
     }
   }
@@ -167,9 +167,17 @@ export async function POST(req: Request) {
         const totalTokens = inputTokens + outputTokens;
 
         if (isBillableTask && taskId) {
-          await completeTask(taskId, user.id, fullResponse, totalTokens);
+          // Save task output and deduct 1 credit
+          const supabase2 = createClient();
+          await supabase2.from("tasks").update({
+            status: "completed",
+            output: fullResponse,
+            tokens_used: totalTokens,
+            completed_at: new Date().toISOString(),
+          }).eq("id", taskId);
+          await incrementCreditsUsage(user.id, 1);
           extractAndSaveMemories(user.id, taskId, userInput, fullResponse).catch(() => {});
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", taskId, isTask: true, tokensUsed: totalTokens })}\n\n`));
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", taskId, isTask: true, creditsUsed: 1, tokensUsed: totalTokens })}\n\n`));
         } else {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done", isTask: false })}\n\n`));
         }

@@ -53,6 +53,10 @@ export default async function DashboardPage() {
   const usagePct = isUnlimited ? 0 : Math.min(100, Math.round((used / limit) * 100));
   const isLow = !isUnlimited && usagePct >= 80;
 
+  const reportsUsed = (usage as (TaskUsage & { reports_used?: number; reports_limit?: number }) | null)?.reports_used ?? 0;
+  const reportsLimit = (usage as (TaskUsage & { reports_used?: number; reports_limit?: number }) | null)?.reports_limit ?? (isUnlimited ? -1 : 5);
+  const reportsLow = !isUnlimited && reportsLimit > 0 && reportsUsed >= reportsLimit * 0.8;
+
   const connectedCount = connectors.filter(c => c.status === "connected").length;
   const unhealthyCount = connectors.filter(c => c.status === "needs_reconnect" || c.status === "error").length;
 
@@ -106,7 +110,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats bar */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           icon={<Zap size={16} className={isLow ? "text-orange-500" : "text-teal"} />}
           label="Tasks this month"
@@ -118,6 +122,21 @@ export default async function DashboardPage() {
           {!isUnlimited && (
             <div className="mt-2 w-full bg-gray-100 rounded-full h-1.5">
               <div className={`h-1.5 rounded-full ${isLow ? "bg-orange-400" : "bg-teal"}`} style={{ width: `${usagePct}%` }} />
+            </div>
+          )}
+        </StatCard>
+
+        <StatCard
+          icon={<Globe size={16} className={reportsLow ? "text-orange-500" : "text-indigo-500"} />}
+          label="Reports this month"
+          value={isUnlimited ? `${reportsUsed} used` : `${reportsUsed} / ${reportsLimit}`}
+          sub={isUnlimited ? "Unlimited plan" : `${reportsLimit - reportsUsed} remaining`}
+          accent={reportsLow ? "border-orange-300 bg-orange-50" : ""}
+          href="/dashboard/workflows/research"
+        >
+          {!isUnlimited && reportsLimit > 0 && (
+            <div className="mt-2 w-full bg-gray-100 rounded-full h-1.5">
+              <div className={`h-1.5 rounded-full ${reportsLow ? "bg-orange-400" : "bg-indigo-400"}`} style={{ width: `${Math.min(100, Math.round((reportsUsed / reportsLimit) * 100))}%` }} />
             </div>
           )}
         </StatCard>

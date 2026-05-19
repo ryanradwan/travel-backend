@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { checkTaskQuota, createTask, completeTask, failTask, updateTaskStep } from "@/lib/agent/tasks";
+import { checkTaskQuota, checkReportQuota, incrementReportUsage, createTask, completeTask, failTask, updateTaskStep } from "@/lib/agent/tasks";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
 import { getMemoryContext, extractAndSaveMemories } from "@/lib/agent/memory";
 import { buildComplianceBlock, detectDestination } from "@/lib/agent/compliance";
@@ -58,12 +58,23 @@ export async function POST(req: Request) {
   // On first step — check quota and create task
   let taskId = existingTaskId;
   if (!existingTaskId) {
-    const quota = await checkTaskQuota(user.id);
-    if (!quota.allowed) {
-      const msg = quota.limit === -1
-        ? "Your account access has been paused. Please check your billing settings."
-        : `You've used all ${quota.limit} tasks this month.`;
-      return Response.json({ error: msg }, { status: 402 });
+    // Research reports have their own separate quota
+    if (workflowId === "research") {
+      const quota = await checkReportQuota(user.id);
+      if (!quota.allowed) {
+        const msg = quota.limit === -1
+          ? "Your account access has been paused. Please check your billing settings."
+          : `You've used all ${quota.limit} destination reports this month. Upgrade to run more.`;
+        return Response.json({ error: msg }, { status: 402 });
+      }
+    } else {
+      const quota = await checkTaskQuota(user.id);
+      if (!quota.allowed) {
+        const msg = quota.limit === -1
+          ? "Your account access has been paused. Please check your billing settings."
+          : `You've used all ${quota.limit} tasks this month.`;
+        return Response.json({ error: msg }, { status: 402 });
+      }
     }
     taskId = await createTask(user.id, input, workflowId, workflow.steps.length);
     if (!taskId) return Response.json({ error: "Failed to start workflow." }, { status: 500 });
@@ -142,7 +153,19 @@ export async function POST(req: Request) {
         fullOutput += buildComplianceBlock(destination, null, false, today).fullBlock;
       }
 
-      await completeTask(taskId, user.id, fullOutput, 0);
+      if (workflowId === "research") {
+        await incrementReportUsage(user.id);
+        // Complete task without incrementing task usage
+        const supabaseAdmin = createClient();
+        await supabaseAdmin.from("tasks").update({
+          status: "completed",
+          output: fullOutput,
+          tokens_used: 0,
+          completed_at: new Date().toISOString(),
+        }).eq("id", taskId);
+      } else {
+        await completeTask(taskId, user.id, fullOutput, 0);
+      }
       extractAndSaveMemories(user.id, taskId, input, fullOutput).catch(() => {});
     }
 

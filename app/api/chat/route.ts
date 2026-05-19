@@ -67,13 +67,15 @@ export async function POST(req: Request) {
   const intent = classifyIntent(userInput);
   const isBillableTask = intent === "task" || workflow !== "general";
 
-  // Check token quota for all requests (questions and tasks)
-  const tokenQuota = await checkTokenQuota(user.id);
-  if (!tokenQuota.allowed) {
-    const msg = tokenQuota.limit === -1
-      ? "Your account access has been paused. Please check your billing settings."
-      : `You've used all of your monthly AI usage. Upgrade your plan to continue.`;
-    return Response.json({ error: msg }, { status: 402 });
+  // Only check token quota for tasks — questions are always free
+  if (isBillableTask) {
+    const tokenQuota = await checkTokenQuota(user.id);
+    if (!tokenQuota.allowed) {
+      const msg = tokenQuota.limit === -1
+        ? "Your account access has been paused. Please check your billing settings."
+        : `You've used all of your monthly AI usage. Upgrade your plan to continue running tasks.`;
+      return Response.json({ error: msg }, { status: 402 });
+    }
   }
 
   const [profileResult, memoryContext] = await Promise.all([
@@ -165,8 +167,10 @@ export async function POST(req: Request) {
 
         const totalTokens = inputTokens + outputTokens;
 
-        // Always track token usage
-        await incrementTokenUsage(user.id, totalTokens);
+        // Only track token usage for tasks — questions are free
+        if (isBillableTask) {
+          await incrementTokenUsage(user.id, totalTokens);
+        }
 
         if (isBillableTask && taskId) {
           const supabase2 = createClient();

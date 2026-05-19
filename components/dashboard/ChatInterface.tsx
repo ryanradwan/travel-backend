@@ -364,7 +364,7 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
               ) : (
                 <>
                   <MessageCircle size={11} className="text-gray-400" />
-                  <span className="text-xs text-gray-400">Question — uses AI usage</span>
+                  <span className="text-xs text-gray-400">Question — free</span>
                 </>
               )}
             </div>
@@ -372,7 +372,7 @@ export default function ChatInterface({ initialWorkflow, businessName }: ChatInt
 
           {!input.trim() && (
             <p className="text-xs text-gray-400 mt-2 text-center">
-              All messages draw from your monthly AI usage · Press Enter to send
+              Questions are free · Tasks draw from your monthly AI usage · Press Enter to send
             </p>
           )}
         </div>

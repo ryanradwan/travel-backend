@@ -225,24 +225,7 @@ export default async function DashboardPage() {
                 ))}
               </div>
             </div>
-          ) : (
-            /* No pipeline yet — show a compact tip strip instead of empty card */
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {[
-                { icon: "✈️", title: "Run a workflow", desc: "Build your first client itinerary or destination report.", href: "/dashboard/workflows/itinerary" },
-                { icon: "📋", title: "Track a booking", desc: "Add a deal to your pipeline to track value and commission.", href: "/dashboard/pipeline?add=1" },
-                { icon: "🔌", title: "Connect an app", desc: "Link Gmail or Google Drive so TravelBackend can save and send.", href: "/dashboard/connectors" },
-              ].map(({ icon, title, desc, href }) => (
-                <Link key={href} href={href} className="card hover:border-teal hover:shadow-sm transition-all group flex items-start gap-3 py-4">
-                  <span className="text-xl leading-none flex-shrink-0">{icon}</span>
-                  <div>
-                    <p className="text-sm font-semibold text-navy group-hover:text-teal transition-colors">{title}</p>
-                    <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{desc}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          ) : null}
         </div>
 
         {/* Right — currency rates */}

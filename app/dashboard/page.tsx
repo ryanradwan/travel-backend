@@ -51,7 +51,7 @@ export default async function DashboardPage() {
   const limit = usage?.tasks_limit ?? 30;
   const isUnlimited = tier === "agency" || tier === "enterprise";
   const usagePct = isUnlimited ? 0 : Math.min(100, Math.round((used / limit) * 100));
-  const isLow = !isUnlimited && usagePct >= 80;
+  void usagePct;
 
   type ExtendedUsage = TaskUsage & { reports_used?: number; reports_limit?: number; credits_used?: number; credits_limit?: number };
   const reportsUsed = (usage as ExtendedUsage | null)?.reports_used ?? 0;

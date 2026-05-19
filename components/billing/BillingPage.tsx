@@ -36,6 +36,7 @@ const PLAN_FEATURES = {
     "Top-up: $5 / 10 tasks",
   ],
   professional: [
+    "7-day free trial",
     "100 tasks/month",
     "15 destination reports/month",
     "5 seats",
@@ -47,6 +48,7 @@ const PLAN_FEATURES = {
     "Top-up: $4 / 10 tasks",
   ],
   agency: [
+    "7-day free trial",
     "Unlimited tasks",
     "Unlimited destination reports",
     "Unlimited seats",

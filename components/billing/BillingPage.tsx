@@ -28,7 +28,7 @@ const PLAN_FEATURES = {
     "30 tasks/month",
     "5 destination reports/month",
     "1 seat",
-    "8 connectors (Gmail, Drive, Calendar, Docs, WhatsApp, Canva, Skyscanner, Mailchimp)",
+    "8 connectors",
     "3 custom skills",
     "3 custom plugins",
     "Template library access",

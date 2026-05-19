@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { checkTaskQuota, checkReportQuota, checkItineraryQuota, checkPackageQuota, incrementReportUsage, incrementItineraryUsage, incrementPackageUsage, createTask, completeTask, failTask, updateTaskStep } from "@/lib/agent/tasks";
+import { checkReportQuota, checkItineraryQuota, checkPackageQuota, incrementReportUsage, incrementItineraryUsage, incrementPackageUsage, createTask, failTask, updateTaskStep } from "@/lib/agent/tasks";
 import { buildSystemPrompt } from "@/lib/agent/system-prompt";
 import { getMemoryContext, extractAndSaveMemories } from "@/lib/agent/memory";
 import { buildComplianceBlock, detectDestination } from "@/lib/agent/compliance";

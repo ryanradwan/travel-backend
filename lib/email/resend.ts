@@ -8,4 +8,5 @@ export function getResend() {
 }
 
 export const FROM_EMAIL = "TravelBackend <hello@travelbackend.com>";
+export const FROM_ADDRESS = "hello@travelbackend.com";
 export const REPLY_TO = "support@travelbackend.com";

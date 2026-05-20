@@ -62,7 +62,7 @@ export async function GET(req: Request) {
   lines.push(`,,,,TOTAL,${totalGross.toFixed(2)},,${totalComm.toFixed(2)}`);
 
   const csv = lines.join("\n");
-  const filename = `tripdesk-revenue-${year}.csv`;
+  const filename = `travelbackend-revenue-${year}.csv`;
 
   return new Response(csv, {
     headers: {

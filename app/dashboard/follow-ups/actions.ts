@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getResend, FROM_EMAIL } from "@/lib/email/resend";
+import { getResend, FROM_ADDRESS } from "@/lib/email/resend";
 import { wrapInEmailHtml } from "@/lib/email/follow-up-templates";
 
 interface EmailDraft {
@@ -50,7 +50,7 @@ export async function approveEmailDraft(id: string, editedBody?: string): Promis
   try {
     const resend = getResend();
     await resend.emails.send({
-      from: `${businessName} via TravelBackend <${FROM_EMAIL}>`,
+      from: `${businessName} via TravelBackend <${FROM_ADDRESS}>`,
       replyTo: user.email!,
       to: d.client_email,
       subject: d.subject,

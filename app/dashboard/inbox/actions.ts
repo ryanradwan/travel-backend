@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { getResend, FROM_EMAIL } from "@/lib/email/resend";
+import { getResend, FROM_ADDRESS } from "@/lib/email/resend";
 
 interface Inquiry {
   id: string;
@@ -45,7 +45,7 @@ export async function sendInquiryResponse(id: string, body: string): Promise<voi
   try {
     const resend = getResend();
     await resend.emails.send({
-      from: `${businessName} <${FROM_EMAIL}>`,
+      from: `${businessName} <${FROM_ADDRESS}>`,
       replyTo: user.email!,
       to: inq.client_email,
       subject: `Your travel inquiry${inq.destination ? ` — ${inq.destination}` : ""}`,

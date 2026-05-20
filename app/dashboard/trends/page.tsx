@@ -88,7 +88,7 @@ export default async function TrendsPage() {
         {hasThisWeek && (
           <div className="flex items-center gap-2 text-xs text-gray-400 border border-border rounded-lg px-3 py-2">
             <RefreshCw size={13} />
-            Next report Monday
+            Fresh report arrives Monday
           </div>
         )}
       </div>

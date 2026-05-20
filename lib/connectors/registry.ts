@@ -345,14 +345,14 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
 
   // ── AGENCY TRAVEL-SPECIFIC ───────────────────────────────────────────────
   amadeus: {
-    id: "amadeus", name: "Amadeus GDS", description: "Live flight, hotel, and car inventory from the world's largest GDS",
+    id: "amadeus", name: "Amadeus GDS", description: "Hotel and car inventory from Amadeus — flight search is powered by Duffel",
     category: "gds", authType: "api_key",
     icon: "🌐", color: "bg-blue-50",
     whatItDoes: [
-      "Search live flight inventory across all airlines",
       "Book hotels with real-time availability and net rates",
-      "Pull accurate pricing into client proposals instantly",
       "Access car rental and rail inventory worldwide",
+      "Pull accurate hotel pricing into client proposals instantly",
+      "Note: live flight search uses Duffel (built in — no connector needed)",
     ],
     availability: "agency",
   },
@@ -656,7 +656,7 @@ export const CONNECTORS: Record<ConnectorId, ConnectorDefinition> = {
       "Search and book flights via Galileo and Apollo GDS",
       "Access full NDC airline content and ancillaries",
       "Pull live availability into TravelBackend proposals",
-      "Complement Amadeus and Sabre for full market coverage",
+      "Complement Sabre and Duffel for full market coverage",
     ],
     availability: "agency",
   },

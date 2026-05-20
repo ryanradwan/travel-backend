@@ -120,7 +120,7 @@ export async function executeWorkflow(
   const systemPrompt = buildSystemPrompt(profile, memoryContext, true);
   const stepOutputs: Record<number, string> = {};
   let fullOutput = "";
-  let liveFlightContext = ""; // populated before step 4 if Amadeus is configured
+  let liveFlightContext = ""; // populated before step 4 if Duffel is configured
 
   try {
     for (const step of workflow.steps) {
@@ -136,7 +136,7 @@ export async function executeWorkflow(
         continue;
       }
 
-      // Before step 4 of the itinerary workflow, fetch live flight prices from Amadeus
+      // Before step 4 of the itinerary workflow, fetch live flight prices from Duffel
       if (workflowId === "itinerary" && step.number === 4 && isAmadeusConfigured()) {
         try {
           const params = await extractFlightParams(userInput);
@@ -147,7 +147,7 @@ export async function executeWorkflow(
             }
           }
         } catch {
-          // Amadeus unavailable — step 4 falls back to AI estimates
+          // Duffel unavailable — step 4 falls back to AI estimates
         }
       }
 

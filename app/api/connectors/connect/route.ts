@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const connector = CONNECTORS[connectorId as ConnectorId];
   if (!connector) return Response.json({ error: "Unknown connector" }, { status: 400 });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
   if (connector.authType === "oauth2" && connector.oauthProvider === "google") {
     if (!process.env.GOOGLE_CLIENT_ID) {

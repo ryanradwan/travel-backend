@@ -6,7 +6,7 @@ export async function GET(req: Request) {
   const code = searchParams.get("code");
   const stateParam = searchParams.get("state");
   const error = searchParams.get("error");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
   if (error || !code || !stateParam) {
     return NextResponse.redirect(`${appUrl}/dashboard/connectors?error=oauth_failed`);

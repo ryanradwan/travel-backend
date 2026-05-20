@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { CheckCircle2, Circle, Loader2, SkipForward, Copy, CheckCheck } from "lucide-react";
+import { CheckCircle2, Circle, Loader2, SkipForward, Copy, CheckCheck, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import { WORKFLOWS, type WorkflowId } from "@/lib/workflows/definitions";
@@ -184,7 +184,7 @@ export default function WorkflowRunner({ workflowId, prefillInput }: WorkflowRun
             <p className="text-sm text-gray-500 mt-0.5">Running — do not close this page</p>
           )}
           {phase === "done" && (
-            <p className="text-sm text-teal mt-0.5">Complete — 1 task used</p>
+            <p className="text-sm text-teal mt-0.5">Complete</p>
           )}
         </div>
         {phase === "done" && (
@@ -286,6 +286,27 @@ export default function WorkflowRunner({ workflowId, prefillInput }: WorkflowRun
           </div>
         </div>
       </div>
+
+      {/* Pipeline notification — itinerary only */}
+      {phase === "done" && workflowId === "itinerary" && (
+        <div className="mt-4 bg-teal/5 border border-teal/20 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-teal/10 flex items-center justify-center flex-shrink-0">
+              <TrendingUp size={15} className="text-teal" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-navy">Pipeline entry created</p>
+              <p className="text-xs text-gray-500 mt-0.5">Add the deal value to track commission in Revenue & Analytics.</p>
+            </div>
+          </div>
+          <a
+            href="/dashboard/pipeline"
+            className="text-xs bg-teal text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity flex-shrink-0"
+          >
+            View in Pipeline →
+          </a>
+        </div>
+      )}
     </div>
   );
 }

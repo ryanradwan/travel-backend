@@ -11,6 +11,37 @@ export const maxDuration = 60;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
+// Extracts client name + destination from itinerary input and creates a pipeline entry
+async function autoPipelineEntry(userId: string, input: string, taskId: string): Promise<void> {
+  try {
+    const msg = await anthropic.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 100,
+      messages: [{
+        role: "user",
+        content: `Extract the client name and destination from this travel request. Return ONLY valid JSON: {"client_name":"Full Name or Unknown","destination":"City/Country"}. If client name is not mentioned use "New Client".\n\nRequest: ${input}`,
+      }],
+    });
+    const raw = msg.content[0].type === "text" ? msg.content[0].text.trim() : "";
+    const json = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+    const { client_name, destination } = JSON.parse(json);
+
+    const supabase = createClient();
+    await supabase.from("bookings").insert({
+      user_id: userId,
+      client_name: client_name || "New Client",
+      destination: destination || "Unknown",
+      gross_value: 0,
+      commission_pct: 10,
+      status: "proposal_sent",
+      task_id: taskId,
+      notes: "Auto-created from Client Itinerary workflow — add deal value to track in Revenue.",
+    });
+  } catch {
+    // Silent fail — pipeline entry is a nice-to-have, not critical
+  }
+}
+
 const STEP_PROMPTS: Record<WorkflowId, Record<number, (input: string, context: string) => string>> = {
   itinerary: {
     1: (input) => `Analyse this client travel request and extract key details. Format as a brief structured summary:\n\n${input}`,
@@ -166,6 +197,8 @@ export async function POST(req: Request) {
         await incrementReportUsage(user.id);
       } else if (workflowId === "itinerary") {
         await incrementItineraryUsage(user.id);
+        // Auto-create a pipeline entry for this itinerary
+        autoPipelineEntry(user.id, input, taskId).catch(() => {});
       } else if (workflowId === "package") {
         await incrementPackageUsage(user.id);
       }

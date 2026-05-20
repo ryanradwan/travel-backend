@@ -172,7 +172,7 @@ export async function searchFlights(params: FlightSearchParams): Promise<FlightO
 
   const offers = response.data?.offers ?? [];
   // Sort by price and take top results
-  const max = params.max ?? 6;
+  const max = params.max ?? 15;
   return (offers as unknown[])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .sort((a: any, b: any) => parseFloat(a.total_amount) - parseFloat(b.total_amount))

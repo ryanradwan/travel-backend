@@ -82,6 +82,7 @@ export default function FlightSearch({ clients = [] }: FlightSearchProps) {
   const [saving, setSaving] = useState(false);
   const [savedClient, setSavedClient] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"price" | "duration" | "stops">("price");
 
   useEffect(() => {
     setRecentSearches(loadRecent());
@@ -400,7 +401,22 @@ export default function FlightSearch({ clients = [] }: FlightSearchProps) {
       {flights && flights.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <p className="text-sm font-semibold text-navy">{flights.length} options found</p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm font-semibold text-navy">{flights.length} options found</p>
+              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+                {(["price", "duration", "stops"] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => setSortBy(opt)}
+                    className={`text-xs px-3 py-1 rounded-md font-medium transition-colors ${
+                      sortBy === opt ? "bg-white text-navy shadow-sm" : "text-gray-500 hover:text-navy"
+                    }`}
+                  >
+                    {opt === "price" ? "Price" : opt === "duration" ? "Duration" : "Stops"}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               {/* Save to client */}
               {clients.length > 0 && (
@@ -440,10 +456,19 @@ export default function FlightSearch({ clients = [] }: FlightSearchProps) {
           )}
 
           {(() => {
-            const prices = flights.map((f) => f.pricePerPerson);
+            const durationToMins = (d: string) => {
+              const m = d.match(/(\d+)h\s*(\d+)?m?/);
+              return m ? parseInt(m[1]) * 60 + parseInt(m[2] ?? "0") : 0;
+            };
+            const sorted = [...flights].sort((a, b) => {
+              if (sortBy === "price") return a.pricePerPerson - b.pricePerPerson;
+              if (sortBy === "stops") return a.stops - b.stops;
+              return durationToMins(a.duration) - durationToMins(b.duration);
+            });
+            const prices = sorted.map((f) => f.pricePerPerson);
             const minP = Math.min(...prices);
             const maxP = Math.max(...prices);
-            return flights.map((f) => {
+            return sorted.map((f) => {
               const clientPricePerPerson = applyMarkup(f.pricePerPerson, markupPct);
               const clientTotal = applyMarkup(f.price, markupPct);
               const isExpanded = expandedId === f.id;

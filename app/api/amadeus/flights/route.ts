@@ -32,7 +32,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const flights = await searchFlights({ origin, destination, departureDate, returnDate, adults, cabin, max: 6 });
+    const flights = await searchFlights({ origin, destination, departureDate, returnDate, adults, cabin, max: 15 });
     const isTestMode = process.env.DUFFEL_API_KEY?.startsWith("duffel_test_") ?? true;
     return Response.json({ flights, isTestMode });
   } catch (err) {

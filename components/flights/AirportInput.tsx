@@ -5,7 +5,7 @@ import { searchAirports, type Airport } from "@/lib/data/airports";
 
 interface AirportInputProps {
   value: string;
-  onChange: (iata: string) => void;
+  onChange: (iata: string, label: string) => void;
   placeholder?: string;
   label: string;
   required?: boolean;
@@ -31,7 +31,7 @@ export default function AirportInput({ value, onChange, placeholder = "JFK", lab
   function handleInput(val: string) {
     setQuery(val);
     setSelected(null);
-    onChange("");
+    onChange("", "");
     const matches = searchAirports(val);
     setResults(matches);
     setOpen(matches.length > 0);
@@ -39,8 +39,9 @@ export default function AirportInput({ value, onChange, placeholder = "JFK", lab
 
   function handleSelect(airport: Airport) {
     setSelected(airport);
-    setQuery(`${airport.city} (${airport.iata})`);
-    onChange(airport.iata);
+    const label = `${airport.city} (${airport.iata})`;
+    setQuery(label);
+    onChange(airport.iata, label);
     setOpen(false);
     setResults([]);
   }

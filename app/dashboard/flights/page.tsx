@@ -13,13 +13,21 @@ export default async function FlightsPage() {
 
   const configured = isAmadeusConfigured();
 
+  const { data: clientRows } = await supabase
+    .from("clients")
+    .select("id, name")
+    .eq("user_id", user.id)
+    .order("name", { ascending: true });
+
+  const clients = (clientRows ?? []) as { id: string; name: string }[];
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-navy">Flight Search</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Live prices from Amadeus GDS — real fares you can quote to clients
+            Live prices from Duffel — real fares you can quote to clients
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs border border-border rounded-lg px-3 py-2">
@@ -39,16 +47,14 @@ export default async function FlightsPage() {
             To enable live flight pricing, add your Duffel API key to your environment variables:
           </p>
           <div className="bg-white border border-yellow-200 rounded-lg p-4 font-mono text-xs text-gray-700">
-            <p>DUFFEL_API_KEY=duffel_test_...</p>
+            <p>DUFFEL_API_KEY=duffel_live_...</p>
           </div>
           <p className="text-sm text-yellow-700">
-            Sign up free at{" "}
-            <span className="font-medium">duffel.com</span>
-            {" "}— get your test key instantly, switch to a live key when ready for production.
+            Sign up at <span className="font-medium">duffel.com</span> — switch to a live key when approved.
           </p>
         </div>
       ) : (
-        <FlightSearch />
+        <FlightSearch clients={clients} />
       )}
     </div>
   );

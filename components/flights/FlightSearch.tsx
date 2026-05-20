@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Loader2, Copy, Check, Plane, AlertTriangle, ArrowLeftRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Loader2, Copy, Check, Plane, AlertTriangle, ArrowLeftRight, Clock, UserCircle, BookmarkCheck } from "lucide-react";
 import { type FlightOffer, formatFlightsForProposal } from "@/lib/amadeus/flights";
 import AirportInput from "./AirportInput";
 
@@ -12,38 +12,98 @@ const CABINS = [
   { value: "FIRST", label: "First Class" },
 ];
 
+interface RecentSearch {
+  origin: string;
+  originLabel: string;
+  destination: string;
+  destinationLabel: string;
+  departureDate: string;
+  returnDate: string;
+  adults: string;
+  cabin: string;
+  tripType: "roundtrip" | "oneway";
+}
+
+interface Client {
+  id: string;
+  name: string;
+}
+
+interface FlightSearchProps {
+  clients?: Client[];
+}
+
 function stopsLabel(n: number) {
   return n === 0 ? "Nonstop" : n === 1 ? "1 stop" : `${n} stops`;
 }
-
 function fmtTime(iso: string) {
   return new Date(iso).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 }
-
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
-
 function applyMarkup(price: number, markupPct: number) {
   return Math.ceil(price * (1 + markupPct / 100));
 }
 
-export default function FlightSearch() {
+const STORAGE_KEY = "tb_recent_flights";
+
+function loadRecent(): RecentSearch[] {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveRecent(search: RecentSearch) {
+  const existing = loadRecent().filter(
+    (r) => !(r.origin === search.origin && r.destination === search.destination)
+  );
+  const updated = [search, ...existing].slice(0, 5);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+}
+
+export default function FlightSearch({ clients = [] }: FlightSearchProps) {
   const [tripType, setTripType] = useState<"roundtrip" | "oneway">("roundtrip");
   const [form, setForm] = useState({
-    origin: "", destination: "", departureDate: "", returnDate: "", adults: "1", cabin: "ECONOMY",
+    origin: "", originLabel: "",
+    destination: "", destinationLabel: "",
+    departureDate: "", returnDate: "", adults: "1", cabin: "ECONOMY",
   });
   const [markupPct, setMarkupPct] = useState(10);
+  const [selectedClientId, setSelectedClientId] = useState("");
   const [loading, setLoading] = useState(false);
   const [flights, setFlights] = useState<FlightOffer[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isTestMode, setIsTestMode] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [savedClient, setSavedClient] = useState<string | null>(null);
+
+  useEffect(() => {
+    setRecentSearches(loadRecent());
+  }, []);
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   function swapAirports() {
-    setForm((f) => ({ ...f, origin: f.destination, destination: f.origin }));
+    setForm((f) => ({
+      ...f,
+      origin: f.destination, originLabel: f.destinationLabel,
+      destination: f.origin, destinationLabel: f.originLabel,
+    }));
+  }
+
+  function applyRecent(r: RecentSearch) {
+    setTripType(r.tripType);
+    setForm({
+      origin: r.origin, originLabel: r.originLabel,
+      destination: r.destination, destinationLabel: r.destinationLabel,
+      departureDate: r.departureDate, returnDate: r.returnDate,
+      adults: r.adults, cabin: r.cabin,
+    });
   }
 
   async function handleSearch(e: React.FormEvent) {
@@ -55,6 +115,7 @@ export default function FlightSearch() {
     setLoading(true);
     setError(null);
     setFlights(null);
+    setSavedClient(null);
 
     const params = new URLSearchParams({
       origin: form.origin,
@@ -71,10 +132,55 @@ export default function FlightSearch() {
       if (!res.ok) throw new Error(data.error ?? "Search failed");
       setFlights(data.flights);
       setIsTestMode(data.isTestMode);
+
+      const recent: RecentSearch = {
+        origin: form.origin,
+        originLabel: form.originLabel || form.origin,
+        destination: form.destination,
+        destinationLabel: form.destinationLabel || form.destination,
+        departureDate: form.departureDate,
+        returnDate: form.returnDate,
+        adults: form.adults,
+        cabin: form.cabin,
+        tripType,
+      };
+      saveRecent(recent);
+      setRecentSearches(loadRecent());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Search failed. Please try again.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleSaveToClient() {
+    if (!flights?.length || !selectedClientId) return;
+    setSaving(true);
+    try {
+      const summary = formatFlightsForProposal(flights, form.origin, form.destination);
+      const res = await fetch("/api/flights/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientId: selectedClientId,
+          flightSummary: summary,
+          searchParams: {
+            origin: form.origin,
+            destination: form.destination,
+            departureDate: form.departureDate,
+            returnDate: form.returnDate,
+            adults: form.adults,
+            cabin: form.cabin,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setSavedClient(data.clientName);
+    } catch {
+      setError("Failed to save to client. Please try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -88,13 +194,11 @@ export default function FlightSearch() {
 
   function copySingle(f: FlightOffer) {
     const markedUp = applyMarkup(f.pricePerPerson, markupPct);
-    const isRoundTrip = !!f.returnDeparture;
     const dep = fmtTime(f.departure);
     const arr = fmtTime(f.arrival);
-    const stops = stopsLabel(f.stops);
     let text = `${f.airline} — $${markedUp.toLocaleString()}/person\n`;
-    text += `Outbound: ${dep} → ${arr} · ${f.duration} · ${stops}`;
-    if (isRoundTrip && f.returnDeparture && f.returnArrival) {
+    text += `Outbound: ${dep} → ${arr} · ${f.duration} · ${stopsLabel(f.stops)}`;
+    if (f.returnDeparture && f.returnArrival) {
       text += `\nReturn: ${fmtTime(f.returnDeparture)} → ${fmtTime(f.returnArrival)} · ${f.returnDuration} · ${stopsLabel(f.returnStops ?? 0)}`;
     }
     navigator.clipboard.writeText(text);
@@ -106,6 +210,30 @@ export default function FlightSearch() {
 
   return (
     <div className="space-y-6">
+      {/* Recent searches */}
+      {recentSearches.length > 0 && (
+        <div>
+          <p className="text-xs text-gray-400 font-medium mb-2 flex items-center gap-1.5">
+            <Clock size={12} /> Recent searches
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {recentSearches.map((r, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => applyRecent(r)}
+                className="text-xs bg-white border border-border rounded-full px-3 py-1.5 hover:border-teal/50 hover:bg-teal/5 transition-colors text-gray-600 flex items-center gap-1.5"
+              >
+                <Plane size={11} className="text-gray-400" />
+                {r.originLabel} → {r.destinationLabel}
+                <span className="text-gray-300">·</span>
+                <span className="text-gray-400">{r.departureDate}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Trip type toggle */}
       <div className="flex gap-2">
         {(["roundtrip", "oneway"] as const).map((t) => (
@@ -126,12 +254,12 @@ export default function FlightSearch() {
 
       {/* Search form */}
       <form onSubmit={handleSearch} className="card space-y-4">
-        {/* Origin / Destination with swap */}
+        {/* Origin / Destination */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative">
           <AirportInput
             label="From"
-            value={form.origin}
-            onChange={(v) => set("origin", v)}
+            value={form.originLabel || form.origin}
+            onChange={(iata, label) => setForm((f) => ({ ...f, origin: iata, originLabel: label }))}
             placeholder="New York, JFK…"
             required
           />
@@ -147,8 +275,8 @@ export default function FlightSearch() {
           </div>
           <AirportInput
             label="To"
-            value={form.destination}
-            onChange={(v) => set("destination", v)}
+            value={form.destinationLabel || form.destination}
+            onChange={(iata, label) => setForm((f) => ({ ...f, destination: iata, destinationLabel: label }))}
             placeholder="Rome, FCO…"
             required
           />
@@ -212,6 +340,26 @@ export default function FlightSearch() {
           </div>
         </div>
 
+        {/* Client selector */}
+        {clients.length > 0 && (
+          <div>
+            <label className="label flex items-center gap-1.5">
+              <UserCircle size={13} className="text-gray-400" />
+              Searching for client <span className="text-gray-400 font-normal">(optional)</span>
+            </label>
+            <select
+              value={selectedClientId}
+              onChange={(e) => setSelectedClientId(e.target.value)}
+              className="input mt-1"
+            >
+              <option value="">— Select a client —</option>
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <button
           type="submit"
           disabled={loading}
@@ -234,7 +382,7 @@ export default function FlightSearch() {
       {flights && isTestMode && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 text-sm text-yellow-800 flex items-start gap-2">
           <AlertTriangle size={15} className="mt-0.5 shrink-0" />
-          <span><strong>Test mode:</strong> Prices shown are Duffel sandbox data, not live fares. Switch to a live Duffel API key to see real prices.</span>
+          <span><strong>Test mode:</strong> Prices shown are Duffel sandbox data, not live fares.</span>
         </div>
       )}
 
@@ -250,22 +398,43 @@ export default function FlightSearch() {
       {/* Results */}
       {flights && flights.length > 0 && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <p className="text-sm font-semibold text-navy">{flights.length} options found</p>
-            <button
-              onClick={copyAll}
-              className="flex items-center gap-1.5 text-xs font-medium text-navy border border-border px-3 py-1.5 rounded hover:bg-gray-50 transition-colors"
-            >
-              {copied === "all" ? <Check size={13} className="text-teal" /> : <Copy size={13} />}
-              {copied === "all" ? "Copied!" : "Copy all to proposal"}
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Save to client */}
+              {clients.length > 0 && (
+                savedClient ? (
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-teal border border-teal/30 bg-teal/5 px-3 py-1.5 rounded">
+                    <BookmarkCheck size={13} />
+                    Saved to {savedClient}
+                  </span>
+                ) : (
+                  <button
+                    onClick={handleSaveToClient}
+                    disabled={!selectedClientId || saving}
+                    className="flex items-center gap-1.5 text-xs font-medium text-navy border border-border px-3 py-1.5 rounded hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    title={!selectedClientId ? "Select a client above first" : "Save this quote to the client"}
+                  >
+                    {saving ? <Loader2 size={13} className="animate-spin" /> : <UserCircle size={13} />}
+                    {saving ? "Saving…" : selectedClientId ? "Save to client" : "Select client to save"}
+                  </button>
+                )
+              )}
+              <button
+                onClick={copyAll}
+                className="flex items-center gap-1.5 text-xs font-medium text-navy border border-border px-3 py-1.5 rounded hover:bg-gray-50 transition-colors"
+              >
+                {copied === "all" ? <Check size={13} className="text-teal" /> : <Copy size={13} />}
+                {copied === "all" ? "Copied!" : "Copy all"}
+              </button>
+            </div>
           </div>
 
           {/* Markup legend */}
           {hasMarkup && (
             <div className="bg-teal/5 border border-teal/20 rounded-lg px-4 py-2.5 flex items-center gap-2 text-xs text-teal">
-              <span className="font-semibold">Markup active: {markupPct}%</span>
-              <span className="text-gray-400">· Net fare shown in gray · Client price shown in navy</span>
+              <span className="font-semibold">Markup: {markupPct}%</span>
+              <span className="text-gray-400">· Client price shown in navy · Net fare in gray</span>
             </div>
           )}
 
@@ -284,9 +453,8 @@ export default function FlightSearch() {
                       </span>
                     </div>
 
-                    {/* Outbound */}
                     <div className="flex items-center gap-3 text-sm flex-wrap">
-                      <span className="text-xs font-semibold text-gray-400 uppercase">Out</span>
+                      <span className="text-xs font-semibold text-gray-400 uppercase w-6">Out</span>
                       <span className="font-semibold text-gray-800">{fmtTime(f.departure)}</span>
                       <span className="text-gray-300">→</span>
                       <span className="font-semibold text-gray-800">{fmtTime(f.arrival)}</span>
@@ -297,10 +465,9 @@ export default function FlightSearch() {
                       </span>
                     </div>
 
-                    {/* Return leg */}
                     {f.returnDeparture && (
                       <div className="flex items-center gap-3 text-sm mt-1 flex-wrap">
-                        <span className="text-xs font-semibold text-gray-400 uppercase">Ret</span>
+                        <span className="text-xs font-semibold text-gray-400 uppercase w-6">Ret</span>
                         <span className="font-semibold text-gray-800">{fmtTime(f.returnDeparture)}</span>
                         <span className="text-gray-300">→</span>
                         <span className="font-semibold text-gray-800">{fmtTime(f.returnArrival!)}</span>
@@ -313,11 +480,10 @@ export default function FlightSearch() {
                     )}
                   </div>
 
-                  {/* Price + copy */}
                   <div className="text-right shrink-0 flex flex-col items-end gap-2">
                     <div>
                       <p className="text-xl font-bold text-navy">${clientPricePerPerson.toLocaleString()}</p>
-                      <p className="text-xs text-gray-400">per person {hasMarkup ? "(client price)" : ""}</p>
+                      <p className="text-xs text-gray-400">per person{hasMarkup ? " (client)" : ""}</p>
                       <p className="text-xs text-gray-400">${clientTotal.toLocaleString()} total</p>
                       {hasMarkup && (
                         <p className="text-xs text-gray-300 mt-0.5">Net: ${f.pricePerPerson.toLocaleString()}/pp</p>

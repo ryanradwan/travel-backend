@@ -43,12 +43,14 @@ export async function generateTrendReport(): Promise<void> {
   const p = profile as {
     business_name: string;
     specialty_destinations: string[] | null;
-    target_clients: string[] | null;
+    target_clients: string | string[] | null;
   } | null;
 
   const month = new Date().toLocaleDateString("en-US", { month: "long" });
   const specialties = p?.specialty_destinations?.join(", ") || "worldwide destinations";
-  const clientTypes = p?.target_clients?.join(", ") || "general travellers";
+  const clientTypes = Array.isArray(p?.target_clients)
+    ? p.target_clients.join(", ")
+    : (p?.target_clients || "general travellers");
   const businessName = p?.business_name ?? "your travel business";
 
   const prompt = `You are a travel industry expert helping a travel advisor at "${businessName}" stay ahead of trends.

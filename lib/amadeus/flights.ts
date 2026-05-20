@@ -1,5 +1,21 @@
 import { duffelPost } from "./client";
 
+export interface FlightSegment {
+  flightNumber: string;
+  airlineCode: string;
+  origin: string;
+  destination: string;
+  departure: string;
+  arrival: string;
+  duration: string;
+}
+
+export interface Layover {
+  airport: string;
+  durationMins: number;
+  durationLabel: string;
+}
+
 export interface FlightOffer {
   id: string;
   airlineCode: string;
@@ -16,6 +32,10 @@ export interface FlightOffer {
   stops: number;
   returnStops?: number;
   cabin: string;
+  segments: FlightSegment[];
+  layovers: Layover[];
+  returnSegments?: FlightSegment[];
+  returnLayovers?: Layover[];
 }
 
 export interface FlightSearchParams {
@@ -42,6 +62,41 @@ export function formatDuration(iso: string): string {
   return [m[1] ? `${m[1]}h` : "", m[2] ? `${m[2]}m` : ""].filter(Boolean).join(" ");
 }
 
+function layoversBetween(segs: unknown[]): Layover[] {
+  const out: Layover[] = [];
+  for (let i = 0; i < segs.length - 1; i++) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const curr = segs[i] as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const next = segs[i + 1] as any;
+    const airport: string = curr.destination?.iata_code ?? "?";
+    const durationMins = Math.round(
+      (new Date(next.departing_at).getTime() - new Date(curr.arriving_at).getTime()) / 60000
+    );
+    const h = Math.floor(durationMins / 60);
+    const m = durationMins % 60;
+    out.push({
+      airport,
+      durationMins,
+      durationLabel: [h ? `${h}h` : "", m ? `${m}m` : ""].filter(Boolean).join(" ") || "0m",
+    });
+  }
+  return out;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseSegments(segs: any[]): FlightSegment[] {
+  return segs.map((s) => ({
+    flightNumber: `${s.marketing_carrier?.iata_code ?? ""}${s.marketing_carrier_flight_number ?? ""}`,
+    airlineCode: s.marketing_carrier?.iata_code ?? "",
+    origin: s.origin?.iata_code ?? "",
+    destination: s.destination?.iata_code ?? "",
+    departure: s.departing_at,
+    arrival: s.arriving_at,
+    duration: formatDuration(s.duration ?? ""),
+  }));
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseOffer(offer: any, adults: number): FlightOffer {
   const outSlice = offer.slices[0];
@@ -64,6 +119,8 @@ function parseOffer(offer: any, adults: number): FlightOffer {
     duration: formatDuration(outSlice.duration),
     stops: outSegs.length - 1,
     cabin: firstSeg.passengers?.[0]?.cabin_class_marketing_name ?? "Economy",
+    segments: parseSegments(outSegs),
+    layovers: layoversBetween(outSegs),
   };
 
   // Return leg
@@ -74,6 +131,8 @@ function parseOffer(offer: any, adults: number): FlightOffer {
     result.returnArrival = retSegs[retSegs.length - 1].arriving_at;
     result.returnDuration = formatDuration(retSlice.duration);
     result.returnStops = retSegs.length - 1;
+    result.returnSegments = parseSegments(retSegs);
+    result.returnLayovers = layoversBetween(retSegs);
   }
 
   return result;

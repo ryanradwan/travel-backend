@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Loader2, Copy, Check, Plane, AlertTriangle, ArrowLeftRight, Clock, UserCircle, BookmarkCheck } from "lucide-react";
-import { type FlightOffer, formatFlightsForProposal } from "@/lib/amadeus/flights";
+import { Search, Loader2, Copy, Check, Plane, AlertTriangle, ArrowLeftRight, Clock, UserCircle, BookmarkCheck, ChevronDown, ChevronUp } from "lucide-react";
+import { type FlightOffer, type FlightSegment, type Layover, formatFlightsForProposal } from "@/lib/amadeus/flights";
 import AirportInput from "./AirportInput";
 
 const CABINS = [
@@ -81,6 +81,7 @@ export default function FlightSearch({ clients = [] }: FlightSearchProps) {
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [saving, setSaving] = useState(false);
   const [savedClient, setSavedClient] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     setRecentSearches(loadRecent());
@@ -438,75 +439,169 @@ export default function FlightSearch({ clients = [] }: FlightSearchProps) {
             </div>
           )}
 
-          {flights.map((f) => {
-            const clientPricePerPerson = applyMarkup(f.pricePerPerson, markupPct);
-            const clientTotal = applyMarkup(f.price, markupPct);
-            return (
-              <div key={f.id} className="card border border-border hover:border-teal/40 transition-colors">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <span className="text-sm font-bold text-navy">{f.airline}</span>
-                      <span className="text-xs text-gray-400">{f.airlineCode}</span>
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full capitalize">
-                        {f.cabin.replace(/_/g, " ").toLowerCase()}
-                      </span>
-                    </div>
+          {(() => {
+            const prices = flights.map((f) => f.pricePerPerson);
+            const minP = Math.min(...prices);
+            const maxP = Math.max(...prices);
+            return flights.map((f) => {
+              const clientPricePerPerson = applyMarkup(f.pricePerPerson, markupPct);
+              const clientTotal = applyMarkup(f.price, markupPct);
+              const isExpanded = expandedId === f.id;
+              const pricePct = maxP === minP ? 0 : ((f.pricePerPerson - minP) / (maxP - minP)) * 100;
+              const hasDetail = f.stops > 0 || (f.returnStops ?? 0) > 0;
+              return (
+                <div key={f.id} className="card border border-border hover:border-teal/40 transition-colors overflow-hidden p-0">
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <span className="text-sm font-bold text-navy">{f.airline}</span>
+                          <span className="text-xs text-gray-400">{f.airlineCode}</span>
+                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full capitalize">
+                            {f.cabin.replace(/_/g, " ").toLowerCase()}
+                          </span>
+                          <PriceBadge pct={pricePct} isOnly={minP === maxP} />
+                        </div>
 
-                    <div className="flex items-center gap-3 text-sm flex-wrap">
-                      <span className="text-xs font-semibold text-gray-400 uppercase w-6">Out</span>
-                      <span className="font-semibold text-gray-800">{fmtTime(f.departure)}</span>
-                      <span className="text-gray-300">→</span>
-                      <span className="font-semibold text-gray-800">{fmtTime(f.arrival)}</span>
-                      <span className="text-xs text-gray-400">{fmtDate(f.arrival)}</span>
-                      <span className="text-xs text-gray-400">· {f.duration}</span>
-                      <span className={`text-xs font-medium ${f.stops === 0 ? "text-teal" : "text-gray-500"}`}>
-                        {stopsLabel(f.stops)}
-                      </span>
-                    </div>
+                        <div className="flex items-center gap-3 text-sm flex-wrap">
+                          <span className="text-xs font-semibold text-gray-400 uppercase w-6">Out</span>
+                          <span className="font-semibold text-gray-800">{fmtTime(f.departure)}</span>
+                          <span className="text-gray-300">→</span>
+                          <span className="font-semibold text-gray-800">{fmtTime(f.arrival)}</span>
+                          <span className="text-xs text-gray-400">{fmtDate(f.arrival)}</span>
+                          <span className="text-xs text-gray-400">· {f.duration}</span>
+                          <span className={`text-xs font-medium ${f.stops === 0 ? "text-teal" : "text-gray-500"}`}>
+                            {stopsLabel(f.stops)}
+                          </span>
+                          {f.segments[0]?.flightNumber && (
+                            <span className="text-xs text-gray-300">{f.segments[0].flightNumber}</span>
+                          )}
+                        </div>
 
-                    {f.returnDeparture && (
-                      <div className="flex items-center gap-3 text-sm mt-1 flex-wrap">
-                        <span className="text-xs font-semibold text-gray-400 uppercase w-6">Ret</span>
-                        <span className="font-semibold text-gray-800">{fmtTime(f.returnDeparture)}</span>
-                        <span className="text-gray-300">→</span>
-                        <span className="font-semibold text-gray-800">{fmtTime(f.returnArrival!)}</span>
-                        <span className="text-xs text-gray-400">{fmtDate(f.returnArrival!)}</span>
-                        <span className="text-xs text-gray-400">· {f.returnDuration}</span>
-                        <span className={`text-xs font-medium ${(f.returnStops ?? 0) === 0 ? "text-teal" : "text-gray-500"}`}>
-                          {stopsLabel(f.returnStops ?? 0)}
-                        </span>
+                        {f.returnDeparture && (
+                          <div className="flex items-center gap-3 text-sm mt-1 flex-wrap">
+                            <span className="text-xs font-semibold text-gray-400 uppercase w-6">Ret</span>
+                            <span className="font-semibold text-gray-800">{fmtTime(f.returnDeparture)}</span>
+                            <span className="text-gray-300">→</span>
+                            <span className="font-semibold text-gray-800">{fmtTime(f.returnArrival!)}</span>
+                            <span className="text-xs text-gray-400">{fmtDate(f.returnArrival!)}</span>
+                            <span className="text-xs text-gray-400">· {f.returnDuration}</span>
+                            <span className={`text-xs font-medium ${(f.returnStops ?? 0) === 0 ? "text-teal" : "text-gray-500"}`}>
+                              {stopsLabel(f.returnStops ?? 0)}
+                            </span>
+                            {f.returnSegments?.[0]?.flightNumber && (
+                              <span className="text-xs text-gray-300">{f.returnSegments[0].flightNumber}</span>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    )}
+
+                      <div className="text-right shrink-0 flex flex-col items-end gap-2">
+                        <div>
+                          <p className="text-xl font-bold text-navy">${clientPricePerPerson.toLocaleString()}</p>
+                          <p className="text-xs text-gray-400">per person{hasMarkup ? " (client)" : ""}</p>
+                          <p className="text-xs text-gray-400">${clientTotal.toLocaleString()} total</p>
+                          {hasMarkup && (
+                            <p className="text-xs text-gray-300 mt-0.5">Net: ${f.pricePerPerson.toLocaleString()}/pp</p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => copySingle(f)}
+                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-navy transition-colors"
+                        >
+                          {copied === f.id ? <Check size={12} className="text-teal" /> : <Copy size={12} />}
+                          {copied === f.id ? "Copied" : "Copy"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Price bar */}
+                    <PriceBar pct={pricePct} isOnly={minP === maxP} />
                   </div>
 
-                  <div className="text-right shrink-0 flex flex-col items-end gap-2">
-                    <div>
-                      <p className="text-xl font-bold text-navy">${clientPricePerPerson.toLocaleString()}</p>
-                      <p className="text-xs text-gray-400">per person{hasMarkup ? " (client)" : ""}</p>
-                      <p className="text-xs text-gray-400">${clientTotal.toLocaleString()} total</p>
-                      {hasMarkup && (
-                        <p className="text-xs text-gray-300 mt-0.5">Net: ${f.pricePerPerson.toLocaleString()}/pp</p>
+                  {/* Segment detail toggle — only on connecting flights */}
+                  {hasDetail && (
+                    <>
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : f.id)}
+                        className="w-full flex items-center justify-center gap-1.5 text-xs text-gray-400 hover:text-navy hover:bg-gray-50 transition-colors py-2 border-t border-border"
+                      >
+                        {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                        {isExpanded ? "Hide" : "Show"} flight details &amp; layovers
+                      </button>
+                      {isExpanded && (
+                        <div className="border-t border-border bg-gray-50 px-5 py-4 space-y-4">
+                          <SegmentDetails label="Outbound" segments={f.segments} layovers={f.layovers} />
+                          {f.returnSegments && f.returnSegments.length > 0 && (
+                            <SegmentDetails label="Return" segments={f.returnSegments} layovers={f.returnLayovers ?? []} />
+                          )}
+                        </div>
                       )}
-                    </div>
-                    <button
-                      onClick={() => copySingle(f)}
-                      className="flex items-center gap-1 text-xs text-gray-400 hover:text-navy transition-colors"
-                    >
-                      {copied === f.id ? <Check size={12} className="text-teal" /> : <Copy size={12} />}
-                      {copied === f.id ? "Copied" : "Copy"}
-                    </button>
-                  </div>
+                    </>
+                  )}
                 </div>
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
 
           <p className="text-xs text-gray-400 text-center pt-1">
             Live fares from Duffel · Subject to availability · Lock in promptly
           </p>
         </div>
       )}
+    </div>
+  );
+}
+
+function PriceBadge({ pct, isOnly }: { pct: number; isOnly: boolean }) {
+  if (isOnly) return null;
+  if (pct <= 33) return <span className="text-xs font-medium text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">Best price</span>;
+  if (pct <= 66) return <span className="text-xs font-medium text-yellow-600 bg-yellow-50 border border-yellow-200 px-2 py-0.5 rounded-full">Mid range</span>;
+  return <span className="text-xs font-medium text-red-500 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">Highest</span>;
+}
+
+function PriceBar({ pct, isOnly }: { pct: number; isOnly: boolean }) {
+  if (isOnly) return null;
+  const color = pct <= 33 ? "bg-green-400" : pct <= 66 ? "bg-yellow-400" : "bg-red-400";
+  return (
+    <div className="mt-3 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+      <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${Math.max(4, pct)}%` }} />
+    </div>
+  );
+}
+
+function fmtDateTime(iso: string) {
+  return new Date(iso).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+}
+
+function SegmentDetails({ label, segments, layovers }: { label: string; segments: FlightSegment[]; layovers: Layover[] }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{label}</p>
+      <div className="space-y-2">
+        {segments.map((seg, i) => (
+          <div key={i}>
+            <div className="flex items-center gap-3 text-xs">
+              <span className="font-bold text-navy w-10">{seg.flightNumber || "—"}</span>
+              <span className="font-medium text-gray-700">{seg.origin}</span>
+              <span className="text-gray-300">→</span>
+              <span className="font-medium text-gray-700">{seg.destination}</span>
+              <span className="text-gray-400">{fmtDateTime(seg.departure)} – {fmtDateTime(seg.arrival)}</span>
+              <span className="text-gray-400">· {seg.duration}</span>
+            </div>
+            {layovers[i] && (
+              <div className="ml-10 mt-1 flex items-center gap-1.5 text-xs text-amber-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+                Layover in <span className="font-semibold">{layovers[i].airport}</span>
+                <span className="text-amber-500">· {layovers[i].durationLabel}</span>
+                {layovers[i].durationMins < 60 && (
+                  <span className="text-red-500 font-medium">(tight connection)</span>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

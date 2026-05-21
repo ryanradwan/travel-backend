@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import RecentTasks from "@/components/dashboard/RecentTasks";
 import ConnectorStatus from "@/components/dashboard/ConnectorStatus";
+import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 import CurrencyRates from "@/components/dashboard/travel/CurrencyRates";
 import TripCountdowns from "@/components/dashboard/travel/TripCountdowns";
 import PeakSeasonCalendar from "@/components/dashboard/travel/PeakSeasonCalendar";
@@ -22,19 +23,21 @@ export default async function DashboardPage() {
 
   const month = new Date().toISOString().slice(0, 7);
 
-  const [userResult, profileResult, usageResult, tasksResult, connectorsResult, bookingsResult, proposalsResult] =
+  const [userResult, profileResult, usageResult, tasksResult, connectorsResult, bookingsResult, proposalsResult, clientsResult] =
     await Promise.all([
       supabase.from("users").select("subscription_tier, trial_ends_at").eq("id", user.id).single(),
-      supabase.from("business_profiles").select("business_name").eq("user_id", user.id).single(),
+      supabase.from("business_profiles").select("business_name, brand_color, brand_logo_url").eq("user_id", user.id).single(),
       supabase.from("task_usage").select("*").eq("user_id", user.id).eq("month", month).single(),
       supabase.from("tasks").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
       supabase.from("connectors").select("*").eq("user_id", user.id),
       supabase.from("bookings").select("id, client_name, destination, gross_value, commission_value, status, departure_date, travel_dates").eq("user_id", user.id).order("created_at", { ascending: false }).limit(20),
       supabase.from("proposals").select("id, status").eq("user_id", user.id).in("status", ["sent", "viewed"]),
+      supabase.from("clients").select("id", { count: "exact", head: true }).eq("user_id", user.id),
     ]);
 
   const userData = userResult.data as { subscription_tier: string; trial_ends_at: string | null } | null;
-  const profile = profileResult.data as { business_name: string } | null;
+  const profile = profileResult.data as { business_name: string; brand_color: string | null; brand_logo_url: string | null } | null;
+  const clientCount = clientsResult.count ?? 0;
   const usage = usageResult.data as TaskUsage | null;
   const tasks = (tasksResult.data ?? []) as Task[];
   const connectors = (connectorsResult.data ?? []) as Connector[];
@@ -93,6 +96,45 @@ export default async function DashboardPage() {
           </Link>
         </div>
       )}
+
+      {/* Onboarding checklist — shown until all steps done or dismissed */}
+      <OnboardingChecklist steps={[
+        {
+          id: "profile",
+          label: "Complete your business profile",
+          desc: "Add your specialties and client types so TravelBackend can personalise every output.",
+          href: "/dashboard/settings/profile",
+          done: !!(profile?.business_name),
+        },
+        {
+          id: "connector",
+          label: "Connect Gmail or Google Drive",
+          desc: "Let TravelBackend send emails and save documents on your behalf.",
+          href: "/dashboard/connectors",
+          done: connectedCount > 0,
+        },
+        {
+          id: "workflow",
+          label: "Run your first workflow",
+          desc: "Try the Client Itinerary — turn a client enquiry into a full proposal in minutes.",
+          href: "/dashboard/workflows/itinerary",
+          done: tasks.length > 0,
+        },
+        {
+          id: "client",
+          label: "Add your first client",
+          desc: "Store client preferences so every itinerary is personalised from the start.",
+          href: "/dashboard/clients/new",
+          done: clientCount > 0,
+        },
+        {
+          id: "brand",
+          label: "Set your brand colours and logo",
+          desc: "Your logo and colours appear on PDF proposals and the client portal.",
+          href: "/dashboard/settings/brand",
+          done: !!(profile?.brand_color && profile.brand_color !== "#0E7C7B") || !!(profile?.brand_logo_url),
+        },
+      ]} />
 
       {/* Header */}
       <div className="flex items-start justify-between">
@@ -240,30 +282,6 @@ export default async function DashboardPage() {
       <Suspense fallback={<div className="card h-20 animate-pulse bg-gray-50" />}>
       </Suspense>
 
-      {/* Onboarding checklist — show if connectors = 0 and tasks = 0 */}
-      {connectedCount === 0 && used === 0 && (
-        <div className="card border-teal border-2">
-          <h3 className="text-sm font-bold text-navy mb-1">Get started in 3 steps</h3>
-          <p className="text-xs text-gray-500 mb-4">You&apos;re set up — here&apos;s how to get the most out of TravelBackend.</p>
-          <div className="space-y-3">
-            {[
-              { step: 1, label: "Run your first workflow", desc: "Try the Client Itinerary — takes 2 minutes.", href: "/dashboard/workflows/itinerary", done: used > 0 },
-              { step: 2, label: "Connect Gmail or Google Drive", desc: "So TravelBackend can save and send on your behalf.", href: "/dashboard/connectors", done: connectedCount > 0 },
-              { step: 3, label: "Set your brand colours and logo", desc: "For branded PDF proposals and the client portal.", href: "/dashboard/settings/brand", done: false },
-            ].map(({ step, label, desc, href, done }) => (
-              <Link key={step} href={href} className="flex items-start gap-3 group">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${done ? "bg-green-500 text-white" : "bg-teal text-white"}`}>
-                  {done ? <CheckCircle2 size={12} /> : step}
-                </div>
-                <div>
-                  <p className={`text-sm font-medium group-hover:text-teal transition-colors ${done ? "text-gray-400 line-through" : "text-navy"}`}>{label}</p>
-                  <p className="text-xs text-gray-400">{desc}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

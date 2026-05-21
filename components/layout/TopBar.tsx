@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Menu, X, Bell } from "lucide-react";
 import Sidebar from "./Sidebar";
+import GlobalSearch from "./GlobalSearch";
 
 interface TopBarProps {
   title?: string;
@@ -25,9 +26,12 @@ export default function TopBar({ title, businessName, userEmail, tier }: TopBarP
           <Menu size={22} />
         </button>
 
-        <h1 className="text-navy font-semibold text-base flex-1">{title}</h1>
+        <div className="flex-1 flex items-center gap-4 min-w-0">
+          {title && <h1 className="text-navy font-semibold text-base hidden lg:block flex-shrink-0">{title}</h1>}
+          <GlobalSearch />
+        </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-shrink-0">
           <button className="text-gray-400 hover:text-navy transition-colors" aria-label="Notifications">
             <Bell size={20} />
           </button>

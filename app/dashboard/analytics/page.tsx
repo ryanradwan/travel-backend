@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { TrendingUp, Target, Clock, XCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, Target, Clock, XCircle, DollarSign } from "lucide-react";
 import MonthlyChart from "@/components/analytics/MonthlyChart";
+import RevenueChart from "@/components/analytics/RevenueChart";
 
 export const metadata = { title: "Analytics — TravelBackend.com" };
 
@@ -107,6 +108,42 @@ export default async function AnalyticsPage() {
     };
   });
 
+  // Monthly commission earned (last 12 months)
+  const monthlyRevData = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
+    const year = d.getFullYear();
+    const mon = d.getMonth();
+    const inMonth = (b: Booking) => {
+      const bd = new Date(b.created_at);
+      return bd.getFullYear() === year && bd.getMonth() === mon;
+    };
+    const commission = won
+      .filter(inMonth)
+      .reduce((s, b) => s + (Number(b.gross_value) * Number(b.commission_pct)) / 100, 0);
+    return {
+      month: i === 11 ? "Now" : MONTHS[mon],
+      commission: Math.round(commission),
+    };
+  });
+
+  const totalCommission = won.reduce(
+    (s, b) => s + (Number(b.gross_value) * Number(b.commission_pct)) / 100, 0
+  );
+
+  // Trend: compare last 3 months vs previous 3 months
+  function trend3m(values: number[]): { pct: number; up: boolean } | null {
+    const recent = values.slice(-3).reduce((a, b) => a + b, 0);
+    const prev = values.slice(-6, -3).reduce((a, b) => a + b, 0);
+    if (prev === 0) return null;
+    const pct = Math.round(((recent - prev) / prev) * 100);
+    return { pct: Math.abs(pct), up: pct >= 0 };
+  }
+
+  const convTrend = trend3m(monthlyData.map((m) =>
+    m.proposals > 0 ? Math.round((m.won / m.proposals) * 100) : 0
+  ));
+  const revTrend = trend3m(monthlyRevData.map((m) => m.commission));
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
@@ -125,6 +162,7 @@ export default async function AnalyticsPage() {
           value={`${conversionRate}%`}
           sub={`${won.length} of ${all.length} proposals won`}
           color="bg-teal/5"
+          trend={convTrend}
         />
         <KpiCard
           icon={<TrendingUp size={18} className="text-blue-500" />}
@@ -134,11 +172,12 @@ export default async function AnalyticsPage() {
           color="bg-blue-50"
         />
         <KpiCard
-          icon={<TrendingUp size={18} className="text-green-500" />}
-          label="Avg Confirmed Value"
-          value={avgDealValue > 0 ? `$${avgDealValue.toLocaleString()}` : "—"}
-          sub="per confirmed booking"
+          icon={<DollarSign size={18} className="text-green-500" />}
+          label="Total Commission"
+          value={totalCommission > 0 ? `$${Math.round(totalCommission).toLocaleString()}` : "—"}
+          sub="all-time earned"
           color="bg-green-50"
+          trend={revTrend}
         />
         <KpiCard
           icon={<Clock size={18} className="text-purple-500" />}
@@ -214,6 +253,25 @@ export default async function AnalyticsPage() {
         </div>
       </div>
 
+      {/* Commission earned trend */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="font-semibold text-navy">Commission Earned</h2>
+          {revTrend && (
+            <span className={`flex items-center gap-1 text-xs font-medium ${revTrend.up ? "text-green-600" : "text-red-500"}`}>
+              {revTrend.up ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
+              {revTrend.pct}% vs prev 3 months
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-gray-400 mb-4">Monthly commission earned — last 12 months</p>
+        {totalCommission === 0 ? (
+          <p className="text-gray-400 text-sm">No commission data yet. Confirm bookings in the Pipeline to start tracking.</p>
+        ) : (
+          <RevenueChart data={monthlyRevData} />
+        )}
+      </div>
+
       {/* Destination conversion table */}
       <div className="card overflow-hidden p-0">
         <div className="px-5 py-4 border-b border-border">
@@ -283,13 +341,22 @@ export default async function AnalyticsPage() {
   );
 }
 
-function KpiCard({ icon, label, value, sub, color }: {
+function KpiCard({ icon, label, value, sub, color, trend }: {
   icon: React.ReactNode; label: string; value: string; sub: string; color: string;
+  trend?: { pct: number; up: boolean } | null;
 }) {
   return (
     <div className="card">
-      <div className={`w-9 h-9 rounded-lg ${color} flex items-center justify-center mb-3`}>
-        {icon}
+      <div className="flex items-start justify-between mb-3">
+        <div className={`w-9 h-9 rounded-lg ${color} flex items-center justify-center`}>
+          {icon}
+        </div>
+        {trend && (
+          <span className={`flex items-center gap-0.5 text-xs font-medium ${trend.up ? "text-green-600" : "text-red-500"}`}>
+            {trend.up ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+            {trend.pct}%
+          </span>
+        )}
       </div>
       <p className="text-2xl font-bold text-navy">{value}</p>
       <p className="text-xs font-medium text-gray-500 mt-0.5">{label}</p>

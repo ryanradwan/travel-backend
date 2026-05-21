@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Wand2, Loader2, Copy, CheckCheck, RotateCcw, AlertTriangle } from "lucide-react";
+import MarkdownContent from "@/components/ui/MarkdownContent";
 
 interface SkillRunnerProps {
   skillId: string;
@@ -168,8 +169,8 @@ export default function SkillRunner({ skillId, skillName, inputs, outputDescript
           )}
 
           {output && (
-            <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap text-sm leading-relaxed border-t border-border pt-3">
-              {output}
+            <div className="border-t border-border pt-3">
+              <MarkdownContent content={output} />
             </div>
           )}
         </div>

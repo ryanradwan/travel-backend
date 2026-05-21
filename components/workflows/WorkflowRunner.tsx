@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import { WORKFLOWS, type WorkflowId } from "@/lib/workflows/definitions";
 import ProposalActions from "@/components/proposals/ProposalActions";
+import MarkdownContent from "@/components/ui/MarkdownContent";
 
 interface StepState {
   status: "pending" | "running" | "complete" | "skipped";
@@ -244,40 +245,8 @@ export default function WorkflowRunner({ workflowId, prefillInput }: WorkflowRun
             )}
 
             {finalOutput && (
-              <div className="prose prose-sm max-w-none text-gray-700 overflow-auto max-h-[60vh] space-y-4">
-                {finalOutput.split("\n\n").map((block, i) => {
-                  if (block.startsWith("## ")) {
-                    return (
-                      <h2 key={i} className="text-base font-bold text-navy mt-6 mb-2 border-b border-border pb-1">
-                        {block.slice(3)}
-                      </h2>
-                    );
-                  }
-                  if (block.startsWith("# ")) {
-                    return <h1 key={i} className="text-lg font-bold text-navy mt-4 mb-2">{block.slice(2)}</h1>;
-                  }
-                  if (block.startsWith("### ")) {
-                    return <h3 key={i} className="text-sm font-semibold text-navy mt-4 mb-1">{block.slice(4)}</h3>;
-                  }
-                  if (block.startsWith("- ") || block.startsWith("* ")) {
-                    const items = block.split("\n").filter(Boolean);
-                    return (
-                      <ul key={i} className="list-disc ml-4 space-y-1">
-                        {items.map((item, j) => (
-                          <li key={j} className="text-sm">{item.replace(/^[-*]\s/, "")}</li>
-                        ))}
-                      </ul>
-                    );
-                  }
-                  if (block.startsWith("|")) {
-                    return <pre key={i} className="text-xs bg-gray-50 rounded p-2 overflow-x-auto">{block}</pre>;
-                  }
-                  if (block.startsWith("---")) {
-                    return <hr key={i} className="border-border my-3" />;
-                  }
-                  if (!block.trim()) return null;
-                  return <p key={i} className="text-sm leading-relaxed">{block}</p>;
-                })}
+              <div className="overflow-auto max-h-[60vh]">
+                <MarkdownContent content={finalOutput} />
               </div>
             )}
             {finalOutput && phase === "done" && (

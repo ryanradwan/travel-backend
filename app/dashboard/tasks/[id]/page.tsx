@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
+import MarkdownContent from "@/components/ui/MarkdownContent";
 
 export default async function TaskDetailPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -97,8 +98,8 @@ export default async function TaskDetailPage({ params }: { params: { id: string 
                   Rerun similar task →
                 </Link>
               </div>
-              <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap max-h-[60vh] overflow-auto text-sm leading-relaxed">
-                {task.output}
+              <div className="max-h-[60vh] overflow-auto">
+                <MarkdownContent content={task.output} />
               </div>
             </div>
           ) : (

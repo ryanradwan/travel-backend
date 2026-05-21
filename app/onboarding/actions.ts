@@ -56,7 +56,8 @@ export async function saveBusinessProfile(formData: FormData) {
     website: parsed.data.website || null,
     phone: parsed.data.phone || null,
     specialty_destinations: specialtyArray,
-  });
+    inquiry_token: crypto.randomUUID(),
+  }, { onConflict: "user_id", ignoreDuplicates: false });
 
   if (error) {
     return { error: "Couldn't save your profile. Please try again." };

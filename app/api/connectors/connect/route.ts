@@ -8,7 +8,8 @@ export async function POST(req: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { connectorId } = await req.json();
+  const body = await req.json() as { connectorId: string; apiKey?: string };
+  const { connectorId, apiKey } = body;
   const connector = CONNECTORS[connectorId as ConnectorId];
   if (!connector) return Response.json({ error: "Unknown connector" }, { status: 400 });
 
@@ -47,10 +48,25 @@ export async function POST(req: Request) {
   }
 
   if (connector.authType === "api_key") {
-    return Response.json({
-      requiresApiKey: true,
-      message: `Enter your ${connector.name} API key to connect.`,
-    });
+    if (!apiKey?.trim()) {
+      return Response.json({
+        requiresApiKey: true,
+        connectorId,
+        connectorName: connector.name,
+        message: `Enter your ${connector.name} API key to connect.`,
+      });
+    }
+
+    await supabase.from("connectors").upsert({
+      user_id: user.id,
+      connector_name: connectorId,
+      status: "connected",
+      access_token_encrypted: Buffer.from(apiKey.trim()).toString("base64"),
+      connected_at: new Date().toISOString(),
+      last_health_check: new Date().toISOString(),
+    }, { onConflict: "user_id,connector_name" });
+
+    return Response.json({ success: true });
   }
 
   return Response.json({ error: "Unsupported auth type" }, { status: 400 });

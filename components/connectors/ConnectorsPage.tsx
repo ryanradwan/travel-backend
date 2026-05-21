@@ -7,7 +7,7 @@ import {
   CONNECTORS, STARTER_CONNECTORS, PROFESSIONAL_LIBRARY, AGENCY_ONLY,
   getConnectorLimits, type ConnectorId,
 } from "@/lib/connectors/registry";
-import { CheckCircle2, AlertCircle, Lock } from "lucide-react";
+import { CheckCircle2, AlertCircle, Lock, Key, Loader2, X } from "lucide-react";
 import Link from "next/link";
 
 type ConnectorStatus = "connected" | "disconnected" | "unhealthy" | "expired";
@@ -34,6 +34,9 @@ export default function ConnectorsPage({ connectors, tier, connectedParam, error
         ? { type: "error", message: "Connection failed. Please try again." }
         : null
   );
+  const [apiKeyModal, setApiKeyModal] = useState<{ connectorId: string; connectorName: string; message: string } | null>(null);
+  const [apiKeyValue, setApiKeyValue] = useState("");
+  const [apiKeySaving, setApiKeySaving] = useState(false);
 
   const limits = getConnectorLimits(tier);
   const connectorMap = Object.fromEntries(connectors.map((c) => [c.connector_name, c]));
@@ -66,10 +69,35 @@ export default function ConnectorsPage({ connectors, tier, connectedParam, error
       return;
     }
     if (data.requiresApiKey) {
-      setBanner({ type: "error", message: data.message });
+      setApiKeyValue("");
+      setApiKeyModal({ connectorId: data.connectorId, connectorName: data.connectorName, message: data.message });
       return;
     }
-    throw new Error(data.error ?? "Connection failed");
+    setBanner({ type: "error", message: data.error ?? "Connection failed. Please try again." });
+  }
+
+  async function handleApiKeySubmit() {
+    if (!apiKeyModal || !apiKeyValue.trim()) return;
+    setApiKeySaving(true);
+    try {
+      const res = await fetch("/api/connectors/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ connectorId: apiKeyModal.connectorId, apiKey: apiKeyValue.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setApiKeyModal(null);
+        setApiKeyValue("");
+        router.refresh();
+        setBanner({ type: "success", message: `${apiKeyModal.connectorName} connected.` });
+      } else {
+        setBanner({ type: "error", message: data.error ?? "Failed to save API key." });
+        setApiKeyModal(null);
+      }
+    } finally {
+      setApiKeySaving(false);
+    }
   }
 
   async function handleDisconnect(connectorId: string) {
@@ -187,6 +215,52 @@ export default function ConnectorsPage({ connectors, tier, connectedParam, error
           })}
         </div>
       </section>
+
+      {/* API key modal */}
+      {apiKeyModal && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Key size={18} className="text-teal" />
+                <h3 className="font-semibold text-navy">Connect {apiKeyModal.connectorName}</h3>
+              </div>
+              <button onClick={() => setApiKeyModal(null)} className="text-gray-400 hover:text-navy">
+                <X size={18} />
+              </button>
+            </div>
+            <p className="text-sm text-gray-500">{apiKeyModal.message}</p>
+            <div>
+              <label className="label">API Key</label>
+              <input
+                type="password"
+                value={apiKeyValue}
+                onChange={(e) => setApiKeyValue(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleApiKeySubmit()}
+                className="input mt-1 w-full font-mono text-sm"
+                placeholder="Paste your API key here…"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={handleApiKeySubmit}
+                disabled={!apiKeyValue.trim() || apiKeySaving}
+                className="flex items-center gap-2 bg-teal text-white text-sm font-semibold px-4 py-2 rounded hover:bg-teal/90 disabled:opacity-50 transition-colors"
+              >
+                {apiKeySaving && <Loader2 size={14} className="animate-spin" />}
+                {apiKeySaving ? "Saving…" : "Connect"}
+              </button>
+              <button
+                onClick={() => setApiKeyModal(null)}
+                className="text-sm text-gray-500 px-4 py-2 rounded hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── SECTION 3: Agency-only ── */}
       <section>

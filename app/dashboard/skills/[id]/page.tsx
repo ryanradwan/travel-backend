@@ -38,7 +38,7 @@ export default async function EditSkillPage({ params }: { params: { id: string }
           <Link href="/dashboard/skills" className="text-sm text-gray-400 hover:text-navy">← Custom skills</Link>
           <h1 className="text-2xl font-bold text-navy mt-2">{skill.name}</h1>
         </div>
-        <Link href={`/dashboard/chat?skill=${skill.id}`} className="btn-teal text-sm px-4 py-2 rounded">
+        <Link href={`/dashboard/skills/${skill.id}/run`} className="btn-teal text-sm px-4 py-2 rounded">
           Run skill →
         </Link>
       </div>

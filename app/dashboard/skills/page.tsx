@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Wand2, Plus, Lock } from "lucide-react";
+import { Wand2, Plus, Lock, Play } from "lucide-react";
 
 const SKILL_LIMITS: Record<string, number> = {
   starter: 3, professional: 10, agency: Infinity, enterprise: Infinity,
@@ -87,27 +87,21 @@ export default async function SkillsPage({ searchParams }: PageProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {skills.map((skill) => (
-            <Link
-              key={skill.id}
-              href={`/dashboard/skills/${skill.id}`}
-              className="card hover:border-teal hover:shadow-card-hover transition-all group"
-            >
-              <div className="flex items-start gap-3 mb-2">
+            <div key={skill.id} className="card hover:border-teal/40 transition-all group flex flex-col">
+              <div className="flex items-start gap-3 mb-2 flex-1">
                 <div className="w-8 h-8 rounded-lg bg-teal/10 flex items-center justify-center flex-shrink-0">
                   <Wand2 size={16} className="text-teal" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-semibold text-navy group-hover:text-teal transition-colors truncate">
-                    {skill.name}
-                  </h3>
+                  <h3 className="font-semibold text-navy truncate">{skill.name}</h3>
                   <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{skill.description}</p>
                 </div>
               </div>
               {Object.keys(skill.inputs).length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
+                <div className="flex flex-wrap gap-1 mt-2 mb-3">
                   {Object.keys(skill.inputs).slice(0, 3).map((k) => (
-                    <span key={k} className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">
-                      {k}
+                    <span key={k} className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded capitalize">
+                      {k.replace(/_/g, " ")}
                     </span>
                   ))}
                   {Object.keys(skill.inputs).length > 3 && (
@@ -115,7 +109,22 @@ export default async function SkillsPage({ searchParams }: PageProps) {
                   )}
                 </div>
               )}
-            </Link>
+              <div className="flex items-center gap-2 pt-3 border-t border-border mt-auto">
+                <Link
+                  href={`/dashboard/skills/${skill.id}/run`}
+                  className="flex items-center gap-1.5 bg-teal text-white text-xs font-semibold px-3 py-1.5 rounded hover:bg-teal/90 transition-colors"
+                >
+                  <Play size={11} />
+                  Run
+                </Link>
+                <Link
+                  href={`/dashboard/skills/${skill.id}`}
+                  className="text-xs text-gray-400 hover:text-navy transition-colors px-2 py-1.5"
+                >
+                  Edit
+                </Link>
+              </div>
+            </div>
           ))}
         </div>
       )}

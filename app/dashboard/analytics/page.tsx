@@ -48,9 +48,7 @@ export default async function AnalyticsPage() {
   const winRate = (won.length + lost.length) > 0
     ? Math.round((won.length / (won.length + lost.length)) * 100)
     : 0;
-  const avgDealValue = won.length > 0
-    ? Math.round(won.reduce((s, b) => s + Number(b.gross_value), 0) / won.length)
-    : 0;
+  void (won.length > 0 ? Math.round(won.reduce((s, b) => s + Number(b.gross_value), 0) / won.length) : 0);
 
   // Avg days to close (only bookings with confirmed_at)
   const closedWithDate = won.filter((b) => b.confirmed_at);

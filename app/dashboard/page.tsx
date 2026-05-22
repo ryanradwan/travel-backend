@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import {
   FileText, Globe, Package, MessageSquare,
-  CheckCircle2, Plug, Zap, ArrowRight,
+  Plug, Zap, ArrowRight,
   Clock, DollarSign, AlertTriangle
 } from "lucide-react";
 import RecentTasks from "@/components/dashboard/RecentTasks";

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { logout } from "@/app/auth/actions";
@@ -100,18 +99,13 @@ export default function Sidebar({
   return (
     <aside className="w-56 bg-navy flex flex-col h-full min-h-screen sticky top-0">
       {/* Logo */}
-      <div className="px-4 py-4 border-b border-white/10">
-        <Link href="/dashboard" className="flex items-center gap-2.5">
-          <Image src="/logo.png" alt="TravelBackend" width={36} height={36} className="flex-shrink-0" />
-          <div className="min-w-0">
-            <p className="text-white text-sm font-bold leading-tight">TravelBackend</p>
-            {businessName && (
-              <p className="text-blue-300/70 text-xs leading-tight truncate">
-                powered by {businessName}
-              </p>
-            )}
-          </div>
+      <div className="px-5 py-4 border-b border-white/10">
+        <Link href="/dashboard" className="text-white text-lg font-bold tracking-tight">
+          TravelBackend
         </Link>
+        {businessName && (
+          <p className="text-blue-300/70 text-xs mt-0.5 truncate">powered by {businessName}</p>
+        )}
       </div>
 
       {/* Grouped nav */}
